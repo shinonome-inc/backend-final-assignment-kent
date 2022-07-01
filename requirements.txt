@@ -1,1 +1,4 @@
 Django~=4.0
+black
+flake8
+isort
