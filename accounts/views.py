@@ -38,4 +38,8 @@ class Create_account(CreateView):
         )
 
 
+class SignUpView:
+    pass
+
+
 create_account = Create_account.as_view()
