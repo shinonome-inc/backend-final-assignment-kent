@@ -1,9 +1,8 @@
-from django.shortcuts import redirect
-from django.shortcuts import render
-from django.contrib.auth import login, authenticate
-from django.views.generic import CreateView
+from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect, render
+from django.views.generic import CreateView, View
+
 from .forms import UserCreateForm
-from django.views.generic import View
 
 
 # アカウント作成
@@ -42,5 +41,6 @@ class SignUpView(View):
 
     def get(self, request, *args, **kwargs):
         pass
+
 
 create_account = Create_account.as_view()
