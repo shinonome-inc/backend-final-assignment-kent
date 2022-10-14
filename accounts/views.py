@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
+from django.views.generic import View
 
 from .forms import UserCreateForm
 
@@ -32,3 +33,11 @@ class SignUpView(UserCreateForm):
                 "form": form,
             },
         )
+
+
+class HomeView(View):
+    def post(self, request, *args, **kwargs):
+        pass
+
+    def get(self, request, *args, **kwargs):
+        pass
