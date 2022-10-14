@@ -32,6 +32,3 @@ class SignUpView(UserCreateForm):
                 "form": form,
             },
         )
-
-
-create_account = SignUpView.as_view()
