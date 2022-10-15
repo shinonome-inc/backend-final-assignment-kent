@@ -14,10 +14,10 @@ class SignUpView(View):
             password = form.cleaned_data.get("password1")
             user = authenticate(username=username, password=password)
             login(request, user)
-            return redirect("/")
+            return redirect("/accounts/home")
         return render(
             request,
-            "create.html",
+            "signup.html",
             {
                 "form": form,
             },
@@ -27,8 +27,16 @@ class SignUpView(View):
         form = UserCreateForm(request.POST)
         return render(
             request,
-            "create.html",
+            "signup.html",
             {
                 "form": form,
             },
         )
+
+
+class HomeView(View):
+    def post(self, request, *args, **kwargs):
+        pass
+
+    def get(self, request, *args, **kwargs):
+        return render(request, "home.html")
