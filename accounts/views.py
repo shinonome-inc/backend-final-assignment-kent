@@ -5,8 +5,7 @@ from django.views.generic import View
 from .forms import UserCreateForm
 
 
-# アカウント作成
-class SignUpView(UserCreateForm):
+class SignUpView(View):
     def post(self, request, *args, **kwargs):
         form = UserCreateForm(data=request.POST)
         if form.is_valid():
@@ -33,11 +32,3 @@ class SignUpView(UserCreateForm):
                 "form": form,
             },
         )
-
-
-class HomeView(View):
-    def post(self, request, *args, **kwargs):
-        pass
-
-    def get(self, request, *args, **kwargs):
-        pass
