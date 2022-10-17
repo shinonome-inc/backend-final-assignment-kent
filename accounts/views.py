@@ -1,11 +1,13 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
+from django.views.generic.edit import CreateView
+from django.views.generic import View
 
 from .forms import UserCreateForm
 
 
 # アカウント作成
-class SignUpView(UserCreateForm):
+class SignUpView(CreateView):
     def post(self, request, *args, **kwargs):
         form = UserCreateForm(data=request.POST)
         if form.is_valid():
@@ -34,4 +36,9 @@ class SignUpView(UserCreateForm):
         )
 
 
-create_account = SignUpView.as_view()
+class HomeView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, "home.html")
+
+    def post(self, request, *args, **kwargs):
+        return render(request, "home.html")
