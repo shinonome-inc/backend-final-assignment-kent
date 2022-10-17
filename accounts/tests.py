@@ -1,15 +1,31 @@
-from django.test import TestCase
+from django.test import Client, TestCase
+from django.urls import reverse
 
 
 class TestSignUpView(TestCase):
+    def setUp(self):
+        self.url = reverse("accounts:signup")
+        self.client = Client()
+
     def test_success_get(self):
-        pass
+        response = self.client.get(reverse("accounts:home"))
+        self.assertEqual(response.status_code, 200)
 
     def test_success_post(self):
-        pass
+        response = self.client.post(reverse("accounts:home"))
+        self.assertEqual(response.status_code, 200)
 
     def test_failure_post_with_empty_form(self):
-        pass
+        data = {
+            "username": "",
+            "password1": "",
+            "password2": "",
+        }
+        print(vars(self))
+        response = self.client.post(self.url, data)
+        print(f"status code : {response.status_code}")
+        self.assertEqual(response.status_code, 200)
+        print(f"{str(response)}")
 
     def test_failure_post_with_empty_username(self):
         pass
