@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
   <body>
-    <form method="POST" action="{% url 'create_account' %}">
+    <form method="POST" action="{% url 'mysite:signup' %}">
       {% csrf_token %}
       <label>ユーザーID</label>
       {{ form.username }} {{ form.username.errors }}
