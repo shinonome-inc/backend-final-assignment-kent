@@ -2,17 +2,36 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 
+def print_red(code):
+    print("\033[31m" + f"status_code:{code}" + "\033[0m")
+
+
 class TestSignUpView(TestCase):
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.setUp()
+
     def setUp(self):
         self.url = reverse("accounts:signup")
         self.client = Client()
 
     def test_success_get(self):
         response = self.client.get(reverse("accounts:home"))
+        print(
+            "\033[31m"
+            + f"status_code:{str(response.status_code)} type:{type(response.status_code)}"
+            + "\033[0m"
+        )
         self.assertEqual(response.status_code, 200)
 
     def test_success_post(self):
-        response = self.client.post(reverse("accounts:home"))
+        data = {
+            "username": "test",
+            "password1": "passcode0000",
+            "password2": "passcode0000",
+        }
+        response = self.client.post(reverse("accounts:signup"), data)
+        print_red(response)
         self.assertEqual(response.status_code, 200)
 
     def test_failure_post_with_empty_form(self):
@@ -21,11 +40,10 @@ class TestSignUpView(TestCase):
             "password1": "",
             "password2": "",
         }
-        print(vars(self))
-        response = self.client.post(self.url, data)
-        print(f"status code : {response.status_code}")
-        self.assertEqual(response.status_code, 200)
-        print(f"{str(response)}")
+        response = self.client.post(reverse("accounts:signup"), data)
+        self.assertFormError(response, "form", "username", "This field is required.")
+        self.assertFormError(response, "form", "password1", "This field is required.")
+        self.assertFormError(response, "form", "password2", "This field is required.")
 
     def test_failure_post_with_empty_username(self):
         pass
