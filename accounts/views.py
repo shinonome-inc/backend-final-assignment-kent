@@ -3,7 +3,8 @@ from django.shortcuts import redirect, render
 from django.views.generic import View
 
 from .forms import UserCreateForm
-from .tests import TestSignUpView
+
+# from .tests import print_red
 
 
 class SignUpView(View):
@@ -26,15 +27,8 @@ class SignUpView(View):
             },
         )
 
-    def test_view():
-        test = TestSignUpView()
-        test.test_success_get()
-        test.test_success_post()
-        test.test_failure_post_with_empty_form()
-
     def get(self, request, *args, **kwargs):
         form = UserCreateForm(request.POST)
-        SignUpView.test_view()
         return render(
             request,
             "signup.html",
