@@ -7,21 +7,23 @@ def print_red(code):
 
 
 class TestSignUpView(TestCase):
-    def __init__(self, *args, **kwargs):
-        super().__init__()
-        self.setUp()
+    """def __init__(self, *args, **kwargs):
+    super().__init__()
+    self.setUp()"""
 
     def setUp(self):
-        self.url = reverse("accounts:signup")
         self.client = Client()
+        self.url = reverse("accounts:signup")
+
+    def runTest():
+        test = TestSignUpView()
+        # test.test_success_get()
+        test.test_success_post()
+        # test.test_failure_post_with_empty_form()
+        # test.test_failure_post_with_empty_username()
 
     def test_success_get(self):
         response = self.client.get(reverse("accounts:home"))
-        print(
-            "\033[31m"
-            + f"status_code:{str(response.status_code)} type:{type(response.status_code)}"
-            + "\033[0m"
-        )
         self.assertEqual(response.status_code, 200)
 
     def test_success_post(self):
@@ -31,22 +33,41 @@ class TestSignUpView(TestCase):
             "password2": "passcode0000",
         }
         response = self.client.post(reverse("accounts:signup"), data)
-        print_red(response)
-        self.assertEqual(response.status_code, 200)
+        # リダイレクトされるため200は返ってこないが、302が返ってくる
+        self.assertEqual(response.status_code, 302)
 
     def test_failure_post_with_empty_form(self):
-        data = {
-            "username": "",
-            "password1": "",
-            "password2": "",
+        data_empty_form = {
+            "username": "hello_world",
+            "password1": "aaaaaaff123",
+            "password2": "aaaaaaff123",
         }
-        response = self.client.post(reverse("accounts:signup"), data)
-        self.assertFormError(response, "form", "username", "This field is required.")
-        self.assertFormError(response, "form", "password1", "This field is required.")
-        self.assertFormError(response, "form", "password2", "This field is required.")
+        response_empty_form = self.client.post(
+            reverse("accounts:signup"), data_empty_form
+        )
+        self.assertFormError(response_empty_form, "form", "username", "このフィールドは必須です。")
+        self.assertFormError(response_empty_form, "form", "password1", "このフィールドは必須です。")
+        self.assertFormError(response_empty_form, "form", "password2", "このフィールドは必須です。")
+        self.assertFormError(response_empty_form, "form", None, "このフィールドは必須です。")
 
     def test_failure_post_with_empty_username(self):
-        pass
+        data_empty_name = {
+            "username": "",
+            "password1": "pass0000",
+            "password2": "pass0000",
+        }
+        response_empty_username = self.client.post(
+            reverse("accounts:signup"), data_empty_name
+        )
+        self.assertFormError(
+            response_empty_username, "form", "username", "このフィールドは必須です。"
+        )
+        self.assertFormError(
+            response_empty_username,
+            "form",
+            "username",
+            "Response did not use any contexts to render the response.",
+        )
 
     def test_failure_post_with_empty_email(self):
         pass
