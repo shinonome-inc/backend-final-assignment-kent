@@ -4,8 +4,6 @@ from django.views.generic import View
 
 from .forms import UserCreateForm
 
-# from .tests import print_red
-
 
 class SignUpView(View):
     def post(self, request, *args, **kwargs):
