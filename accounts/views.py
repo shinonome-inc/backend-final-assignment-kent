@@ -11,10 +11,9 @@ class SignUpView(View):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get("username")
-            print(f"username:{username}")
             password = form.cleaned_data.get("password1")
-            print(f"password:{password}")
-            user = authenticate(username=username, password=password)
+            email = form.cleaned_data.get("email")
+            user = authenticate(username=username, email=email, password=password)
             login(request, user)
             return redirect("/accounts/home")
         return render(

@@ -1,5 +1,7 @@
-from django.test import Client, TestCase
+from django.test import TestCase
 from django.urls import reverse
+
+from accounts.forms import UserCreateForm
 
 
 def print_red(code):
@@ -9,11 +11,11 @@ def print_red(code):
 class TestSignUpView(TestCase):
     """def __init__(self, *args, **kwargs):
     super().__init__()
-    self.setUp()"""
+    self.setUp()
 
     def setUp(self):
         self.client = Client()
-        self.url = reverse("accounts:signup")
+        self.url = reverse("accounts:signup")"""
 
     def runTest():
         test = TestSignUpView()
@@ -29,6 +31,7 @@ class TestSignUpView(TestCase):
     def test_success_post(self):
         data = {
             "username": "test",
+            "email": "hoge@email.com",
             "password1": "passcode0000",
             "password2": "passcode0000",
         }
@@ -38,39 +41,36 @@ class TestSignUpView(TestCase):
 
     def test_failure_post_with_empty_form(self):
         data_empty_form = {
-            "username": "hello_world",
-            "password1": "aaaaaaff123",
-            "password2": "aaaaaaff123",
+            "username": "",
+            "email": "",
+            "password1": "",
+            "password2": "",
         }
-        response_empty_form = self.client.post(
-            reverse("accounts:signup"), data_empty_form
-        )
-        self.assertFormError(response_empty_form, "form", "username", "このフィールドは必須です。")
-        self.assertFormError(response_empty_form, "form", "password1", "このフィールドは必須です。")
-        self.assertFormError(response_empty_form, "form", "password2", "このフィールドは必須です。")
-        self.assertFormError(response_empty_form, "form", None, "このフィールドは必須です。")
+        form = UserCreateForm(data_empty_form)
+        form.is_valid()
+        print_red(f"{form.errors.as_json}\n")
 
     def test_failure_post_with_empty_username(self):
         data_empty_name = {
             "username": "",
+            "email": "hoge@email.com",
             "password1": "pass0000",
             "password2": "pass0000",
         }
-        response_empty_username = self.client.post(
-            reverse("accounts:signup"), data_empty_name
-        )
-        self.assertFormError(
-            response_empty_username, "form", "username", "このフィールドは必須です。"
-        )
-        self.assertFormError(
-            response_empty_username,
-            "form",
-            "username",
-            "Response did not use any contexts to render the response.",
-        )
+        form = UserCreateForm(data_empty_name)
+        form.is_valid()
+        print_red(f"{form.errors.as_json}\n")
 
     def test_failure_post_with_empty_email(self):
-        pass
+        data_empty_name = {
+            "username": "test",
+            "email": "",
+            "password1": "pass0000",
+            "password2": "pass0000",
+        }
+        form = UserCreateForm(data_empty_name)
+        form.is_valid()
+        print_red(f"{form.errors.as_json}\n")
 
     def test_failure_post_with_empty_password(self):
         pass
