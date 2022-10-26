@@ -3,7 +3,6 @@ from django.urls import reverse
 
 from accounts.forms import UserCreateForm
 
-from .models import User
 
 
 def print_red(code):
