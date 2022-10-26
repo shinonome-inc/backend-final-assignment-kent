@@ -3,7 +3,7 @@ from django.db import models
 
 
 class User(AbstractUser):
-    pass
+    email = models.EmailField(blank=False)
 
 
 class FriendShip(models.Model):
