@@ -4,7 +4,6 @@ from django.urls import reverse
 from accounts.forms import UserCreateForm
 
 
-
 def print_red(code):
     print("\n" + "\033[31m" + f"{code}" + "\033[0m")
 
