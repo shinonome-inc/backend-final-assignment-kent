@@ -3,19 +3,16 @@ from django.urls import reverse
 
 from accounts.forms import UserCreateForm
 
+from .models import User
+
 
 def print_red(code):
-    print("\033[31m" + f"status_code:{code}" + "\033[0m")
+    print("\n" + "\033[31m" + f"{code}" + "\033[0m")
 
 
 class TestSignUpView(TestCase):
-    """def __init__(self, *args, **kwargs):
-    super().__init__()
-    self.setUp()
-
     def setUp(self):
-        self.client = Client()
-        self.url = reverse("accounts:signup")"""
+        self.url = reverse("accounts:signup")
 
     def runTest():
         test = TestSignUpView()
@@ -48,7 +45,7 @@ class TestSignUpView(TestCase):
         }
         form = UserCreateForm(data_empty_form)
         form.is_valid()
-        print_red(f"{form.errors.as_json}\n")
+        print_red(f"!!! test_failure_post_with_empty_form !!! : {form.errors.as_data}")
 
     def test_failure_post_with_empty_username(self):
         data_empty_name = {
@@ -59,24 +56,53 @@ class TestSignUpView(TestCase):
         }
         form = UserCreateForm(data_empty_name)
         form.is_valid()
-        print_red(f"{form.errors.as_json}\n")
+        print_red(
+            f"!!! test_failure_post_with_empty_username !!!: {form.errors.as_data}"
+        )
 
     def test_failure_post_with_empty_email(self):
-        data_empty_name = {
+        data_empty_email = {
             "username": "test",
             "email": "",
             "password1": "pass0000",
             "password2": "pass0000",
         }
-        form = UserCreateForm(data_empty_name)
+        form = UserCreateForm(data_empty_email)
         form.is_valid()
-        print_red(f"{form.errors.as_json}\n")
+        print_red(f"!!! test_failure_post_with_empty_email !!! : {form.errors.as_data}")
 
     def test_failure_post_with_empty_password(self):
-        pass
+        data_empty_passwword = {
+            "username": "test",
+            "email": "hoge@email.com",
+            "password1": "",
+            "password2": "",
+        }
+        form = UserCreateForm(data_empty_passwword)
+        form.is_valid()
+        print_red(
+            f"!!! test_failure_post_with_empty_password !!! : {form.errors.as_data}"
+        )
 
     def test_failure_post_with_duplicated_user(self):
-        pass
+        duplicated_user_data = {
+            "username": "test",
+            "email": "fuga@email.com",
+            "password1": "passcode0000",
+            "password2": "passcode0000",
+        }
+        self.client.post(reverse("accounts:signup"), duplicated_user_data)
+        duplicated_user_data = {
+            "username": "test",
+            "email": "fuga@email.com",
+            "password1": "passcode0000",
+            "password2": "passcode0000",
+        }
+        form = UserCreateForm(duplicated_user_data)
+        form.is_valid()
+        print_red(
+            f"!!! test_failure_post_with_duplicated_user !!! : {form.errors.as_data}"
+        )
 
     def test_failure_post_with_invalid_email(self):
         pass
