@@ -103,19 +103,69 @@ class TestSignUpView(TestCase):
         )
 
     def test_failure_post_with_invalid_email(self):
-        pass
+        data_invalid_email = {
+            "username": "testpscd",
+            "email": "fuga.email.com",
+            "password1": "test0000",
+            "password2": "test0000",
+        }
+        form = UserCreateForm(data_invalid_email)
+        form.is_valid()
+        print_red(
+            f"!!! test_failure_post_with_invalid_email !!! : {form.errors.as_data}"
+        )
 
     def test_failure_post_with_too_short_password(self):
-        pass
+        data_too_short_password = {
+            "username": "test",
+            "email": "fuga@email.com",
+            "password1": "passcd",
+            "password2": "passcd",
+        }
+        form = UserCreateForm(data_too_short_password)
+        form.is_valid()
+        print_red(
+            f"!!! test_failure_post_with_too_short_password !!! : {form.errors.as_data}"
+        )
 
     def test_failure_post_with_password_similar_to_username(self):
-        pass
+        data_similar_to_username = {
+            "username": "testpscd",
+            "email": "fuga@email.com",
+            "password1": "testpscd",
+            "password2": "testpscd",
+        }
+        form = UserCreateForm(data_similar_to_username)
+        form.is_valid()
+        print_red(
+            f"!!! test_failure_post_with_password_similar_to_username !!! : {form.errors.as_data}"
+        )
 
     def test_failure_post_with_only_numbers_password(self):
-        pass
+        data_only_numbers_password = {
+            "username": "testpscd",
+            "email": "fuga@email.com",
+            "password1": "20040326",
+            "password2": "20040326",
+        }
+        form = UserCreateForm(data_only_numbers_password)
+        form.is_valid()
+        print_red(
+            f"!!! test_failure_post_with_only_numbers_password !!! : {form.errors.as_data}"
+        )
 
     def test_failure_post_with_mismatch_password(self):
-        pass
+        data_only_numbers_password = {
+            "username": "testpscd",
+            "email": "fuga@email.com",
+            "password1": "testpasscd",
+            "password2": "testpassdc",
+        }
+        form = UserCreateForm(data_only_numbers_password)
+        form.is_valid()
+        print_red(
+            f"!!! test_failure_post_with_mismatch_password !!! : {form.errors.as_data}"
+        )
 
 
 class TestHomeView(TestCase):
