@@ -102,24 +102,21 @@ class TestSignUpView(TestCase):
         self.assertEqual(User.objects.count(), 0)
 
     def test_failure_post_with_duplicated_user(self):
-        data1 = {
+        duplicated_user = User(
+            username="test", email="fuga@email.com", password="passcode0000"
+        )
+        duplicated_user.save()
+        data = {
             "username": "test",
             "email": "fuga@email.com",
             "password1": "passcode0000",
             "password2": "passcode0000",
         }
-        self.client.post(reverse("accounts:signup"), data1)
-        data2 = {
-            "username": "test",
-            "email": "fuga@email.com",
-            "password1": "passcode0000",
-            "password2": "passcode0000",
-        }
-        form = UserCreateForm(data2)
+        form = UserCreateForm(data)
         form.is_valid()
         expected_error_mes = "{'username': [ValidationError(['同じユーザー名が既に登録済みです。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data2)
+        response = self.client.post(reverse("accounts:signup"), data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 1)
 
