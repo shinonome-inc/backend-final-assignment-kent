@@ -1,8 +1,5 @@
-import json
-
 import colorama
 from colorama import Fore
-from django.core import serializers
 from django.test import TestCase
 from django.urls import reverse
 
