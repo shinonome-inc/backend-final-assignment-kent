@@ -100,13 +100,9 @@ class TestSignUpView(TestCase):
         self.assertEqual(User.objects.count(), 0)
 
     def test_failure_post_with_duplicated_user(self):
-        data1 = {
-            "username": "test",
-            "email": "fuga@email.com",
-            "password1": "passcode0000",
-            "password2": "passcode0000",
-        }
-        self.client.post(reverse("accounts:signup"), data1)
+        User.objects.create(
+            username="test", email="fuga@email.com", password="passcode0000"
+        )
         data2 = {
             "username": "test",
             "email": "fuga@email.com",
