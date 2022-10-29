@@ -35,7 +35,7 @@ class SignUpView(View):
         )
 
 
-class HomeView(View):
+class WelcomeView(View):
     def post(self, request, *args, **kwargs):
         return render(request, "home.html")
 
