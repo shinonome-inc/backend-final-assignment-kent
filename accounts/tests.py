@@ -34,10 +34,10 @@ class TestSignUpView(TestCase):
         }
         response = self.client.post(reverse("accounts:signup"), data)
         self.assertRedirects(response, reverse("accounts:home"), 302, 200)
-        added_record = User.objects.filter(username="test")
-        self.assertTrue(added_record.exists())
-        self.assertEquals(added_record[0].username, "test")
-        self.assertEquals(added_record[0].email, "hoge@email.com")
+        added_user = User.objects.filter(username="test")
+        self.assertTrue(added_user.exists())
+        self.assertEquals(added_user[0].username, "test")
+        self.assertEquals(added_user[0].email, "hoge@email.com")
 
     def test_failure_post_with_empty_form(self):
         data = {
