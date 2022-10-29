@@ -36,10 +36,8 @@ class TestSignUpView(TestCase):
         self.assertRedirects(response, reverse("accounts:home"), 302, 200)
         added_record = User.objects.filter(username="test")
         self.assertTrue(added_record.exists())
-        added_record_json = serializers.serialize("json", added_record)
-        json_data = json.loads(added_record_json)
-        self.assertEquals(json_data[0]["fields"]["username"], "test")
-        self.assertEquals(json_data[0]["fields"]["email"], "hoge@email.com")
+        self.assertEquals(added_record[0].username, "test")
+        self.assertEquals(added_record[0].email, "hoge@email.com")
 
     def test_failure_post_with_empty_form(self):
         data = {
