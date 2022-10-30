@@ -33,11 +33,3 @@ class SignUpView(View):
                 "form": form,
             },
         )
-
-
-class WelcomeView(View):
-    def post(self, request, *args, **kwargs):
-        return render(request, "home.html")
-
-    def get(self, request, *args, **kwargs):
-        return render(request, "home.html")
