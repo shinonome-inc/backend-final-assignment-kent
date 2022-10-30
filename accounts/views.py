@@ -1,9 +1,10 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import View
 
-from .forms import UserCreateForm
+from .forms import SignInForm, UserCreateForm
 
 
 class SignUpView(View):
@@ -34,3 +35,18 @@ class SignUpView(View):
                 "form": form,
             },
         )
+
+
+class SignInView(LoginView):
+    template_name = "signin.html"
+    form_class = SignInForm
+
+
+class SignOutView(View):
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return redirect(reverse("welcome:home"))
+
+    def post(self, request, *args, **kwargs):
+        logout(request)
+        return redirect(reverse("welcome:home"))
