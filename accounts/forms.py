@@ -1,4 +1,4 @@
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 from .models import User
 
@@ -19,3 +19,7 @@ class UserCreateForm(UserCreationForm):
             "password1",
             "password2",
         )
+
+
+class SignInForm(AuthenticationForm):
+    pass
