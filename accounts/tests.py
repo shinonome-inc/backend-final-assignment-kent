@@ -30,7 +30,7 @@ class TestSignUpView(TestCase):
             "password2": "passcode0000",
         }
         response = self.client.post(reverse("accounts:signup"), data)
-        self.assertRedirects(response, reverse("accounts:home"), 302, 200)
+        self.assertRedirects(response, reverse("welcome:home"), 302, 200)
         added_user = User.objects.filter(username="test")
         self.assertTrue(added_user.exists())
         self.assertEquals(added_user[0].username, "test")
@@ -198,7 +198,7 @@ class TestSignUpView(TestCase):
 
 class TestHomeView(TestCase):
     def test_success_get(self):
-        response = self.client.get(reverse("accounts:home"))
+        response = self.client.get(reverse("welcome:home"))
         self.assertEqual(response.status_code, 200)
 
 
