@@ -1,1 +1,6 @@
-Django~=4.0
+Django~=4.1
+black
+flake8
+isort
+fabric
+colorama
