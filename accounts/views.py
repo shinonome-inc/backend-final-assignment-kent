@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.generic import View
 
 from .forms import UserCreateForm
@@ -15,7 +16,7 @@ class SignUpView(View):
             email = form.cleaned_data.get("email")
             user = authenticate(username=username, email=email, password=password)
             login(request, user)
-            return redirect("/accounts/home")
+            return redirect(reverse("welcome:home"))
         return render(
             request,
             "signup.html",
