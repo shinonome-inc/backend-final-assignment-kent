@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.forms import UserCreateForm
+from mysite.settings import LOGIN_REDIRECT_URL
 
 from .models import User
 
@@ -204,10 +205,19 @@ class TestHomeView(TestCase):
 
 class TestLoginView(TestCase):
     def test_success_get(self):
-        pass
+        response = self.client.get(reverse("accounts:signin"))
+        self.assertEqual(response.status_code, 200)
 
     def test_success_post(self):
-        pass
+        User.objects.create(
+            username="test", email="hoge@email.com", password="passcode0000"
+        )
+        userdata = {
+            "username": "test",
+            "password": "passcode0000",
+        }
+        response = self.client.post(reverse("accounts:signin"), userdata)
+        self.assertRedirects(response, LOGIN_REDIRECT_URL, 302, 200)
 
     def test_failure_post_with_not_exists_user(self):
         pass
