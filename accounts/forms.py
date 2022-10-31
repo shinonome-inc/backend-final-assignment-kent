@@ -21,5 +21,5 @@ class UserCreateForm(UserCreationForm):
         )
 
 
-class SignInForm(AuthenticationForm):
+class UserSignInForm(AuthenticationForm):
     pass
