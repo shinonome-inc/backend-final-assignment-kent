@@ -217,6 +217,9 @@ class TestLoginView(TestCase):
             "password": "passcode0000",
         }
         response = self.client.post(reverse("accounts:signin"), userdata)
+        form = UserCreateForm(userdata)
+        print_colored_text(form.as_p(), Fore.BLUE)
+        self.assertTrue(form.is_valid())
         self.assertRedirects(response, LOGIN_REDIRECT_URL, 302, 200)
 
     def test_failure_post_with_not_exists_user(self):
