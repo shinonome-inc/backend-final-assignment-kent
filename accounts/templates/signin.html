@@ -6,6 +6,7 @@
 <h1>SignIn</h1>
 
 <form method="POST" action="">
+    {{ context }}
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" id="save" value="Save" />
