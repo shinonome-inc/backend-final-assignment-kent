@@ -1,4 +1,7 @@
+from colorama import Fore
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+
+from mysite.useful_funcs import print_colored_text
 
 from .models import User
 
@@ -22,4 +25,11 @@ class UserCreateForm(UserCreationForm):
 
 
 class UserSignInForm(AuthenticationForm):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].widget.attrs["class"] = "form-control"
+        self.fields["password"].widget.attrs["class"] = "form-control"
+
+    class Meta:
+        model = User
+        fields = ("username", "password")
