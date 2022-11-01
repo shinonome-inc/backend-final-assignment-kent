@@ -1,9 +1,8 @@
-from colorama import Fore
+from django.contrib.auth import SESSION_KEY
 from django.test import TestCase
 from django.urls import reverse
 
-from mysite.settings import LOGIN_REDIRECT_URL
-from mysite.useful_funcs import print_colored_text
+from mysite.settings import LOGIN_REDIRECT_URL, LOGOUT_REDIRECT_URL
 
 from .forms import UserCreateForm, UserSignInForm
 from .models import User
@@ -89,7 +88,7 @@ class TestSignUpView(TestCase):
         self.assertEqual(User.objects.count(), 0)
 
     def test_failure_post_with_duplicated_user(self):
-        User.objects.create(
+        User.objects.create_user(
             username="test", email="fuga@email.com", password="passcode0000"
         )
         data2 = {
@@ -200,28 +199,49 @@ class TestLoginView(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_success_post(self):
-        User.objects.create(
-            username="test", email="hoge@email.com", password="passcode0000"
+        User.objects.create_user(
+            username="testuser", email="hoge@email.com", password="testpasscd"
         )
         userdata = {
             "username": "testuser",
             "password": "testpasscd",
         }
         response = self.client.post(reverse("accounts:signin"), userdata)
-        form = UserSignInForm(userdata)
+        form = UserSignInForm(data=userdata)
         self.assertTrue(form.is_valid())
         self.assertRedirects(response, LOGIN_REDIRECT_URL, 302, 200)
+        self.assertNotEqual(self.client.session.session_key, {})
 
     def test_failure_post_with_not_exists_user(self):
-        pass
+        userdata = {
+            "username": "testuser",
+            "password": "testpasscd",
+        }
+        response = self.client.post(reverse("accounts:signin"), userdata)
+        form = UserSignInForm(data=userdata)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(response.status_code, 200)
+        form = UserSignInForm(data=userdata)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_empty_password(self):
-        pass
+        userdata = {
+            "username": "testuser",
+            "password": "",
+        }
+        response = self.client.post(reverse("accounts:signin"), userdata)
+        form = UserSignInForm(data=userdata)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(response.status_code, 200)
+        form = UserSignInForm(data=userdata)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
 
 class TestLogoutView(TestCase):
     def test_success_get(self):
-        pass
+        response = self.client.get(reverse("accounts:signout"))
+        self.assertRedirects(response, LOGOUT_REDIRECT_URL, 302, 200)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
 
 class TestUserProfileView(TestCase):

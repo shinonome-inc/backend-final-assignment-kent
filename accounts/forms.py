@@ -1,7 +1,4 @@
-from colorama import Fore
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-
-from mysite.useful_funcs import print_colored_text
 
 from .models import User
 
