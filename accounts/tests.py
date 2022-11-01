@@ -1,21 +1,12 @@
-import colorama
 from colorama import Fore
 from django.test import TestCase
 from django.urls import reverse
 
-from accounts.forms import UserCreateForm
 from mysite.settings import LOGIN_REDIRECT_URL
+from mysite.useful_funcs import print_colored_text
 
+from .forms import UserCreateForm, UserSignInForm
 from .models import User
-
-
-def print_colored_text(code, *styles):
-    colorama.init()
-    text_to_print = ""
-    for style in styles:
-        text_to_print += style
-    text_to_print += str(code)
-    print(f"{text_to_print}" + Fore.RESET)
 
 
 class TestSignUpView(TestCase):
@@ -213,12 +204,11 @@ class TestLoginView(TestCase):
             username="test", email="hoge@email.com", password="passcode0000"
         )
         userdata = {
-            "username": "test",
-            "password": "passcode0000",
+            "username": "testuser",
+            "password": "testpasscd",
         }
         response = self.client.post(reverse("accounts:signin"), userdata)
-        form = UserCreateForm(userdata)
-        print_colored_text(form.as_p(), Fore.BLUE)
+        form = UserSignInForm(userdata)
         self.assertTrue(form.is_valid())
         self.assertRedirects(response, LOGIN_REDIRECT_URL, 302, 200)
 
