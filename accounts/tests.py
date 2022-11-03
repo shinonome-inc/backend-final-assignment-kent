@@ -2,8 +2,9 @@ from django.contrib.auth import SESSION_KEY
 from django.test import TestCase
 from django.urls import reverse
 
-from mysite.settings import LOGIN_REDIRECT_URL, LOGOUT_REDIRECT_URL
+from django.conf import settings
 
+from .views import SignInView, SignOutView
 from .forms import UserCreateForm, UserSignInForm
 from .models import User
 
@@ -209,7 +210,7 @@ class TestLoginView(TestCase):
         response = self.client.post(reverse("accounts:signin"), userdata)
         form = UserSignInForm(data=userdata)
         self.assertTrue(form.is_valid())
-        self.assertRedirects(response, LOGIN_REDIRECT_URL, 302, 200)
+        self.assertRedirects(response, SignInView.LOGIN_REDIRECT_URL, 302, 200)
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_not_exists_user(self):
@@ -244,7 +245,7 @@ class TestLogoutView(TestCase):
 
     def test_success_get(self):
         response = self.client.get(reverse("accounts:signout"))
-        self.assertRedirects(response, LOGOUT_REDIRECT_URL, 302, 200)
+        self.assertRedirects(response, SignOutView.LOGOUT_REDIRECT_URL, 302, 200)
         self.assertNotIn(SESSION_KEY, self.client.session)
 
 
