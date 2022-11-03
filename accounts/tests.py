@@ -237,13 +237,10 @@ class TestLoginView(TestCase):
 
 class TestLogoutView(TestCase):
     def setUp(self):
-        userdata = {
-            "username": "test",
-            "email": "hoge@email.com",
-            "password1": "passcode0000",
-            "password2": "passcode0000",
-        }
-        self.client.post(reverse("accounts:signup"), userdata)
+        user = User.objects.create_user(
+            username="test", password="testpasscd", email="hoge@email.com"
+        )
+        self.client.force_login(user)
 
     def test_success_get(self):
         response = self.client.get(reverse("accounts:signout"))
