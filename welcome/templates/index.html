@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  WELCOME
+{% endblock title %}
+{% block body %}
+  <h1>Backend Final Assignment</h1>
+  <h2>
+    {% if request.user.is_authenticated %}
+    {{ user.username }}
+    {% else %}
+    現在ログインしていません
+    {% endif %}
+  </h2>
+  <a href="{% url 'accounts:signin' %}">SignIn</a>
+  <a href="{% url 'accounts:signout' %}">SignOut</a>
+{% endblock body %}
