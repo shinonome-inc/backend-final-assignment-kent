@@ -12,6 +12,7 @@
     現在ログインしていません
     {% endif %}
   </h2>
+  <a href="{% url 'accounts:signup' %}">SignUp</a>
   <a href="{% url 'accounts:signin' %}">SignIn</a>
   <a href="{% url 'accounts:signout' %}">SignOut</a>
 {% endblock body %}
