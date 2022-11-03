@@ -210,7 +210,7 @@ class TestLoginView(TestCase):
         form = UserSignInForm(data=userdata)
         self.assertTrue(form.is_valid())
         self.assertRedirects(response, LOGIN_REDIRECT_URL, 302, 200)
-        self.assertNotEqual(self.client.session.session_key, {})
+        self.assertIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_not_exists_user(self):
         userdata = {
@@ -221,7 +221,6 @@ class TestLoginView(TestCase):
         form = UserSignInForm(data=userdata)
         self.assertFalse(form.is_valid())
         self.assertEqual(response.status_code, 200)
-        form = UserSignInForm(data=userdata)
         self.assertNotIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_empty_password(self):
@@ -233,11 +232,19 @@ class TestLoginView(TestCase):
         form = UserSignInForm(data=userdata)
         self.assertFalse(form.is_valid())
         self.assertEqual(response.status_code, 200)
-        form = UserSignInForm(data=userdata)
         self.assertNotIn(SESSION_KEY, self.client.session)
 
 
 class TestLogoutView(TestCase):
+    def setUp(self):
+        userdata = {
+            "username": "test",
+            "email": "hoge@email.com",
+            "password1": "passcode0000",
+            "password2": "passcode0000",
+        }
+        self.client.post(reverse("accounts:signup"), userdata)
+
     def test_success_get(self):
         response = self.client.get(reverse("accounts:signout"))
         self.assertRedirects(response, LOGOUT_REDIRECT_URL, 302, 200)
