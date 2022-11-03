@@ -8,11 +8,15 @@
   <h2>
     {% if request.user.is_authenticated %}
       {{ user.username }}
-      <a href="{% url 'accounts:signout' %}"><button>SignOut</button></a>
+      <div>
+        <a href="{% url 'accounts:signout' %}"><button>SignOut</button></a>
+      </div>
     {% else %}
       現在ログインしていません
-      <a href="{% url 'accounts:signup' %}"><button>SignUp</button></a>
-      <a href="{% url 'accounts:signin' %}"><button>SignIn</button></a>
+      <div>
+        <a href="{% url 'accounts:signup' %}"><button>SignUp</button></a>
+        <a href="{% url 'accounts:signin' %}"><button>SignIn</button></a>
+      </div>
     {% endif %}
   </h2>
 {% endblock body %}
