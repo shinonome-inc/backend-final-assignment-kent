@@ -64,7 +64,3 @@ class SignOutView(View):
     def get(self, request, *args, **kwargs):
         logout(request)
         return redirect(reverse("welcome:home"))
-
-    def post(self, request, *args, **kwargs):
-        logout(request)
-        return redirect(reverse("welcome:home"))
