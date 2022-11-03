@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.views import LogoutView
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import View
@@ -61,10 +62,5 @@ class SignInView(View):
         return render(request, template_name, {"form": form})
 
 
-class SignOutView(View):
-    def get(self, request, *args, **kwargs):
-        return redirect(settings.LOGOUT_REDIRECT_URL)
-
-    def post(self, request, *args, **kwargs):
-        logout(request)
-        return redirect(settings.LOGOUT_REDIRECT_URL)
+class SignOutView(LogoutView):
+    pass
