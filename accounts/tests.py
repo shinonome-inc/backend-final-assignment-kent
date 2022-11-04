@@ -214,7 +214,7 @@ class TestLoginView(TestCase):
         response = self.client.post(self.signin_url, userdata)
         form = UserSignInForm(data=userdata)
         self.assertTrue(form.is_valid())
-        self.assertRedirects(response, settings.LOGIN_REDIRECT_URL, 302, 200)
+        self.assertRedirects(response, reverse(settings.LOGIN_REDIRECT_URL), 302, 200)
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_not_exists_user(self):
@@ -249,7 +249,7 @@ class TestLogoutView(TestCase):
 
     def test_success_post(self):
         response = self.client.post(reverse("accounts:signout"))
-        self.assertRedirects(response, settings.LOGOUT_REDIRECT_URL, 302, 200)
+        self.assertRedirects(response, reverse(settings.LOGOUT_REDIRECT_URL), 302, 200)
         self.assertNotIn(SESSION_KEY, self.client.session)
 
 
