@@ -5,6 +5,8 @@ from . import views
 app_name = "accounts"
 urlpatterns = [
     path("signup", views.SignUpView.as_view(), name="signup"),
+    path("signin", views.SignInView.as_view(), name="signin"),
+    path("signout", views.SignOutView.as_view(), name="signout")
     # path('profile/', views.UserProfileView.as_view(), name='user_profile'),
     # path('profile/edit/', views.UserProfileEditView.as_view(), name='user_profile_edit'),
     # path('<str:username>/following_list/', views.FollowingListView.as_view(), name='following_list'),

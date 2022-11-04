@@ -1,9 +1,11 @@
+from django.conf import settings
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.views import LogoutView
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import View
 
-from .forms import UserCreateForm
+from .forms import UserCreateForm, UserSignInForm
 
 
 class SignUpView(View):
@@ -34,3 +36,31 @@ class SignUpView(View):
                 "form": form,
             },
         )
+
+
+class SignInView(View):
+    def post(self, request, *args, **kwargs):
+        form = UserSignInForm(data=request.POST)
+        if form.is_valid():
+            # フォームから'username'を読み取る
+            username = form.cleaned_data.get("username")
+            # フォームから'password'を読み取る
+            password = form.cleaned_data.get("password")
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                # 認証処理
+                login(request, user)
+                return redirect(settings.LOGIN_REDIRECT_URL)
+            else:
+                return render(request, "signin.html", {"context": "ログインに失敗しました"})
+        else:
+            return render(request, "signin.html", {"context": "formが無効です"})
+
+    def get(self, request, *args, **kwargs):
+        template_name = "signin.html"
+        form = UserSignInForm()
+        return render(request, template_name, {"form": form})
+
+
+class SignOutView(LogoutView):
+    pass

@@ -1,25 +1,18 @@
-import colorama
-from colorama import Fore
+from django.conf import settings
+from django.contrib.auth import SESSION_KEY
 from django.test import TestCase
 from django.urls import reverse
 
-from accounts.forms import UserCreateForm
-
+from .forms import UserCreateForm, UserSignInForm
 from .models import User
 
 
-def print_colored_text(code, *styles):
-    colorama.init()
-    text_to_print = ""
-    for style in styles:
-        text_to_print += style
-    text_to_print += str(code)
-    print(f"{text_to_print}" + Fore.RESET)
-
-
 class TestSignUpView(TestCase):
+    def setUp(self):
+        self.signup_url = reverse("accounts:signup")
+
     def test_success_get(self):
-        response = self.client.get(reverse("accounts:signup"))
+        response = self.client.get(self.signup_url)
         self.assertEqual(response.status_code, 200)
 
     def test_success_post(self):
@@ -29,7 +22,7 @@ class TestSignUpView(TestCase):
             "password1": "passcode0000",
             "password2": "passcode0000",
         }
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertRedirects(response, reverse("welcome:home"), 302, 200)
         added_user = User.objects.filter(username="test")
         self.assertTrue(added_user.exists())
@@ -47,7 +40,7 @@ class TestSignUpView(TestCase):
         form.is_valid()
         expected_error_mes = "{'username': [ValidationError(['このフィールドは必須です。'])], 'email': [ValidationError(['このフィールドは必須です。'])], 'password1': [ValidationError(['このフィールドは必須です。'])], 'password2': [ValidationError(['このフィールドは必須です。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -62,7 +55,7 @@ class TestSignUpView(TestCase):
         form.is_valid()
         expected_error_mes = "{'username': [ValidationError(['このフィールドは必須です。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -77,7 +70,7 @@ class TestSignUpView(TestCase):
         form.is_valid()
         expected_error_mes = "{'email': [ValidationError(['このフィールドは必須です。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -92,12 +85,12 @@ class TestSignUpView(TestCase):
         form.is_valid()
         expected_error_mes = "{'password1': [ValidationError(['このフィールドは必須です。'])], 'password2': [ValidationError(['このフィールドは必須です。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
     def test_failure_post_with_duplicated_user(self):
-        User.objects.create(
+        User.objects.create_user(
             username="test", email="fuga@email.com", password="passcode0000"
         )
         data2 = {
@@ -110,7 +103,7 @@ class TestSignUpView(TestCase):
         form.is_valid()
         expected_error_mes = "{'username': [ValidationError(['同じユーザー名が既に登録済みです。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data2)
+        response = self.client.post(self.signup_url, data2)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 1)
 
@@ -125,7 +118,7 @@ class TestSignUpView(TestCase):
         form.is_valid()
         expected_error_mes = "{'email': [ValidationError(['有効なメールアドレスを入力してください。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -142,7 +135,7 @@ class TestSignUpView(TestCase):
             "{'password2': [ValidationError(['このパスワードは短すぎます。最低 8 文字以上必要です。'])]}"
         )
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -159,7 +152,7 @@ class TestSignUpView(TestCase):
             "{'password2': [ValidationError(['このパスワードは ユーザー名 と似すぎています。'])]}"
         )
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -176,7 +169,7 @@ class TestSignUpView(TestCase):
             "{'password2': [ValidationError(['このパスワードは数字しか使われていません。'])]}"
         )
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -191,7 +184,7 @@ class TestSignUpView(TestCase):
         form.is_valid()
         expected_error_mes = "{'password2': [ValidationError(['確認用パスワードが一致しません。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -203,22 +196,61 @@ class TestHomeView(TestCase):
 
 
 class TestLoginView(TestCase):
+    def setUp(self):
+        User.objects.create_user(
+            username="successtest", email="test@email.com", password="testpasscd"
+        )
+        self.signin_url = reverse("accounts:signin")
+
     def test_success_get(self):
-        pass
+        response = self.client.get(self.signin_url)
+        self.assertEqual(response.status_code, 200)
 
     def test_success_post(self):
-        pass
+        userdata = {
+            "username": "successtest",
+            "password": "testpasscd",
+        }
+        response = self.client.post(self.signin_url, userdata)
+        form = UserSignInForm(data=userdata)
+        self.assertTrue(form.is_valid())
+        self.assertRedirects(response, reverse(settings.LOGIN_REDIRECT_URL), 302, 200)
+        self.assertIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_not_exists_user(self):
-        pass
+        userdata = {
+            "username": "testuser",
+            "password": "testpasscd",
+        }
+        response = self.client.post(self.signin_url, userdata)
+        form = UserSignInForm(data=userdata)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_empty_password(self):
-        pass
+        userdata = {
+            "username": "testuser",
+            "password": "",
+        }
+        response = self.client.post(self.signin_url, userdata)
+        form = UserSignInForm(data=userdata)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
 
 class TestLogoutView(TestCase):
-    def test_success_get(self):
-        pass
+    def setUp(self):
+        user = User.objects.create_user(
+            username="test", password="testpasscd", email="hoge@email.com"
+        )
+        self.client.force_login(user)
+
+    def test_success_post(self):
+        response = self.client.post(reverse("accounts:signout"))
+        self.assertRedirects(response, reverse(settings.LOGOUT_REDIRECT_URL), 302, 200)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
 
 class TestUserProfileView(TestCase):

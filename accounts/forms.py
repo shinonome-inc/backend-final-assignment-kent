@@ -1,4 +1,4 @@
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 from .models import User
 
@@ -6,10 +6,6 @@ from .models import User
 class UserCreateForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["username"].widget.attrs["class"] = "form-control"
-        self.fields["email"].widget.attrs["class"] = "form-control"
-        self.fields["password1"].widget.attrs["class"] = "form-control"
-        self.fields["password2"].widget.attrs["class"] = "form-control"
 
     class Meta:
         model = User
@@ -19,3 +15,9 @@ class UserCreateForm(UserCreationForm):
             "password1",
             "password2",
         )
+
+
+class UserSignInForm(AuthenticationForm):
+    class Meta:
+        model = User
+        fields = ("username", "password")
