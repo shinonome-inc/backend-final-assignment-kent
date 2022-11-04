@@ -8,8 +8,11 @@ from .models import User
 
 
 class TestSignUpView(TestCase):
+    def setUp(self):
+        self.signup_url = reverse("accounts:signup")
+
     def test_success_get(self):
-        response = self.client.get(reverse("accounts:signup"))
+        response = self.client.get(self.signup_url)
         self.assertEqual(response.status_code, 200)
 
     def test_success_post(self):
@@ -19,7 +22,7 @@ class TestSignUpView(TestCase):
             "password1": "passcode0000",
             "password2": "passcode0000",
         }
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertRedirects(response, reverse("welcome:home"), 302, 200)
         added_user = User.objects.filter(username="test")
         self.assertTrue(added_user.exists())
@@ -37,7 +40,7 @@ class TestSignUpView(TestCase):
         form.is_valid()
         expected_error_mes = "{'username': [ValidationError(['このフィールドは必須です。'])], 'email': [ValidationError(['このフィールドは必須です。'])], 'password1': [ValidationError(['このフィールドは必須です。'])], 'password2': [ValidationError(['このフィールドは必須です。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -52,7 +55,7 @@ class TestSignUpView(TestCase):
         form.is_valid()
         expected_error_mes = "{'username': [ValidationError(['このフィールドは必須です。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -67,7 +70,7 @@ class TestSignUpView(TestCase):
         form.is_valid()
         expected_error_mes = "{'email': [ValidationError(['このフィールドは必須です。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -82,7 +85,7 @@ class TestSignUpView(TestCase):
         form.is_valid()
         expected_error_mes = "{'password1': [ValidationError(['このフィールドは必須です。'])], 'password2': [ValidationError(['このフィールドは必須です。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -100,7 +103,7 @@ class TestSignUpView(TestCase):
         form.is_valid()
         expected_error_mes = "{'username': [ValidationError(['同じユーザー名が既に登録済みです。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data2)
+        response = self.client.post(self.signup_url, data2)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 1)
 
@@ -115,7 +118,7 @@ class TestSignUpView(TestCase):
         form.is_valid()
         expected_error_mes = "{'email': [ValidationError(['有効なメールアドレスを入力してください。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -132,7 +135,7 @@ class TestSignUpView(TestCase):
             "{'password2': [ValidationError(['このパスワードは短すぎます。最低 8 文字以上必要です。'])]}"
         )
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -149,7 +152,7 @@ class TestSignUpView(TestCase):
             "{'password2': [ValidationError(['このパスワードは ユーザー名 と似すぎています。'])]}"
         )
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -166,7 +169,7 @@ class TestSignUpView(TestCase):
             "{'password2': [ValidationError(['このパスワードは数字しか使われていません。'])]}"
         )
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -181,7 +184,7 @@ class TestSignUpView(TestCase):
         form.is_valid()
         expected_error_mes = "{'password2': [ValidationError(['確認用パスワードが一致しません。'])]}"
         self.assertEqual(expected_error_mes, str(form.errors.as_data()))
-        response = self.client.post(reverse("accounts:signup"), data)
+        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -193,19 +196,22 @@ class TestHomeView(TestCase):
 
 
 class TestLoginView(TestCase):
+    def setUp(self):
+        User.objects.create_user(
+            username="successtest", email="test@email.com", password="testpasscd"
+        )
+        self.signin_url = reverse("accounts:signin")
+
     def test_success_get(self):
-        response = self.client.get(reverse("accounts:signin"))
+        response = self.client.get(self.signin_url)
         self.assertEqual(response.status_code, 200)
 
     def test_success_post(self):
-        User.objects.create_user(
-            username="testuser", email="hoge@email.com", password="testpasscd"
-        )
         userdata = {
-            "username": "testuser",
+            "username": "successtest",
             "password": "testpasscd",
         }
-        response = self.client.post(reverse("accounts:signin"), userdata)
+        response = self.client.post(self.signin_url, userdata)
         form = UserSignInForm(data=userdata)
         self.assertTrue(form.is_valid())
         self.assertRedirects(response, settings.LOGIN_REDIRECT_URL, 302, 200)
@@ -216,7 +222,7 @@ class TestLoginView(TestCase):
             "username": "testuser",
             "password": "testpasscd",
         }
-        response = self.client.post(reverse("accounts:signin"), userdata)
+        response = self.client.post(self.signin_url, userdata)
         form = UserSignInForm(data=userdata)
         self.assertFalse(form.is_valid())
         self.assertEqual(response.status_code, 200)
@@ -227,7 +233,7 @@ class TestLoginView(TestCase):
             "username": "testuser",
             "password": "",
         }
-        response = self.client.post(reverse("accounts:signin"), userdata)
+        response = self.client.post(self.signin_url, userdata)
         form = UserSignInForm(data=userdata)
         self.assertFalse(form.is_valid())
         self.assertEqual(response.status_code, 200)

@@ -18,9 +18,6 @@ class UserCreateForm(UserCreationForm):
 
 
 class UserSignInForm(AuthenticationForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     class Meta:
         model = User
         fields = ("username", "password")
