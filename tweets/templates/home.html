@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title%} サインアップ {%endblock%}
+
+{% block body %}
+<h1>SignUp</h1>
+  {% if request.user.is_authenticated %}
+  {{ user.username }}
+    <div>
+      <a href="{% url 'accounts:signout' %}"><button>SignOut</button></a>
+    </div>
+  {% else %}
+  現在ログインしていません
+    <div>
+      <a href="{% url 'accounts:signup' %}"><button>SignUp</button></a>
+      <a href="{% url 'accounts:signin' %}"><button>SignIn</button></a>
+    </div>
+  {% endif %}
+{% endblock %}
