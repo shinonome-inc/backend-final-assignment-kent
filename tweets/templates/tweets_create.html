@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title%} ツイート {%endblock%}
+
+{% block body %}
+    <form method="POST" action="">
+        {% csrf_token %}
+        {% if request.user.is_authenticated %}
+            {{ form.as_p }}
+            <input type="submit" id="save" value="save">
+        {% endif %}
+    </form>
+{% endblock %}
