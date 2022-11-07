@@ -11,6 +11,11 @@
       <div>
         <a href="{% url 'accounts:signout' %}"><button>SignOut</button></a>
       </div>
+      <div>
+        {% for t in tweets %}
+          <a href="tweets/{{ t.id }}"><p>{{ t.content }}</p></a>
+        {% endfor %}
+      </div>
     {% else %}
       現在ログインしていません
       <div>
