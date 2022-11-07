@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from accounts.models import User
 from tweets.forms import TweetCreateForm
+from tweets.models import Tweet
 
 
 class TestTweetCreateView(TestCase):
@@ -53,8 +54,17 @@ class TestTweetCreateView(TestCase):
 
 
 class TestTweetDetailView(TestCase):
+    def setUp(self):
+        user = User.objects.create_user(
+            username="test_user", email="hoge@email.com", password="testpass0000"
+        )
+        self.client.force_login(user=user)
+        Tweet.objects.create(content="test_tweet", user=user)
+
     def test_success_get(self):
-        pass
+        response = self.client.get(reverse("tweets:detail"), data={"pk": 1})
+        print(response)
+        self.assertInHTML("{{ tweet.content }}")
 
 
 class TestTweetDeleteView(TestCase):
