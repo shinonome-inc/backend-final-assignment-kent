@@ -5,7 +5,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import View
 
-from .forms import UserCreateForm, UserSignInForm
+from accounts.forms import UserCreateForm, UserSignInForm
 
 
 class SignUpView(View):

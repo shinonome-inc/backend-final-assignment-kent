@@ -3,8 +3,8 @@ from django.contrib.auth import SESSION_KEY
 from django.test import TestCase
 from django.urls import reverse
 
-from .forms import UserCreateForm, UserSignInForm
-from .models import User
+from accounts.forms import UserCreateForm, UserSignInForm
+from accounts.models import User
 
 
 class TestSignUpView(TestCase):
