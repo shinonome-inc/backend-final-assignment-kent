@@ -4,5 +4,6 @@
 
 {% block body %}
     {% if request.user.is_authenticated %}
+        {% form.as_p %}
     {% endif %}
 {% endblock %}
