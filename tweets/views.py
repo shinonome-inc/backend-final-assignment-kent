@@ -23,3 +23,9 @@ class TweetDetailView(View):
     def get(self, request, pk, *args, **kwargs):
         tweet = get_object_or_404(Tweet, pk=pk)
         return render(request, "tweets_detail.html", {"tweet": tweet})
+
+
+class TweetDeleteView(View):
+    def get(self, request, pk, *args, **kwargs):
+        tweet = get_object_or_404(Tweet, pk=pk)
+        return render(request, "tweets_detail.html", {"tweet": tweet})
