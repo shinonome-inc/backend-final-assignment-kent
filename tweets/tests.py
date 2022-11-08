@@ -59,12 +59,16 @@ class TestTweetDetailView(TestCase):
             username="test_user", email="hoge@email.com", password="testpass0000"
         )
         self.client.force_login(user=user)
-        Tweet.objects.create(content="test_tweet", user=user)
+        for i in range(5):
+            Tweet.objects.create(content="test_tweet", user=user)
 
     def test_success_get(self):
-        response = self.client.get(reverse("tweets:detail"), data={"pk": 1})
-        print(response)
-        self.assertInHTML("{{ tweet.content }}")
+        for tweet in Tweet.objects.all():
+            tweet_id = tweet.id
+            response = self.client.get(
+                reverse("tweets:detail", kwargs={"pk": tweet_id}), data={"pk": tweet_id}
+            )
+            self.assertInHTML(f"{tweet.content}", response.context["tweet"].content)
 
 
 class TestTweetDeleteView(TestCase):
