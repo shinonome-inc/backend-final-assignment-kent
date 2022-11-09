@@ -60,20 +60,31 @@ class TestTweetDetailView(TestCase):
         )
         self.client.force_login(user=user)
         for i in range(5):
-            Tweet.objects.create(content="test_tweet", user=user)
+            Tweet.objects.create(content=f"test_tweet{i}", user=user)
 
     def test_success_get(self):
         for tweet in Tweet.objects.all():
-            tweet_id = tweet.id
             response = self.client.get(
-                reverse("tweets:detail", kwargs={"pk": tweet_id}), data={"pk": tweet_id}
+                reverse("tweets:detail", kwargs={"pk": tweet.id})
             )
-            self.assertInHTML(f"{tweet.content}", response.context["tweet"].content)
+            # self.assertIsNotNone(response.context)
+            self.assertInHTML(tweet.content, response.content)
 
 
 class TestTweetDeleteView(TestCase):
+    def setUp(self):
+        user = User.objects.create_user(
+            username="test_user", email="hoge@email.com", password="testpass0000"
+        )
+        self.tweet_id_list = []
+        self.client.force_login(user=user)
+        self.tweet = Tweet.objects.create(content="test_tweet", user=user)
+
     def test_success_post(self):
-        pass
+        tweet_id = self.tweet.id
+        response = self.client.post(reverse("tweets:delete", kwargs={"pk": tweet_id}))
+        self.assertRedirects(response, reverse("welcome:home"), 302, 200)
+        self.assertFalse(Tweet.objects.filter(id=tweet_id).exists())
 
     def test_failure_post_with_not_exist_tweet(self):
         pass
