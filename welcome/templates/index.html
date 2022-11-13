@@ -12,9 +12,23 @@
         <a href="{% url 'accounts:signout' %}"><button>SignOut</button></a>
       </div>
       <div>
-        {% for t in tweets %}
-          <a href="tweets/{{ t.id }}"><p>{{ t.content }}</p></a>
-        {% endfor %}
+        <a href="{% url 'tweets:create' %}"><button>Tweet!</button></a>
+      </div>
+      <div>
+        <table border="1">
+          <tr>
+              <th>ID</th>
+              <th>内容</th>
+              <th>作成日</th>
+          </tr>
+          {% for tweet in tweets %}
+            <tr>
+              <td>{{ tweet.id }}</td>
+              <td><a href={% url 'tweets:detail' tweet.pk %}>{{ tweet.content }}</a></td>
+              <td>{{ tweet.created_at }}</td>
+            </tr>
+          {% endfor %}
+        </table>
       </div>
     {% else %}
       現在ログインしていません

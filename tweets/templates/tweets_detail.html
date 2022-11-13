@@ -3,5 +3,18 @@
 {% block title%} ツイート {%endblock%}
 
 {% block body %}
-    <div>{{ tweet.id }} {{ tweet.content }}</div>
+    <div>
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>内容</th>
+                <th>作成日</th>
+            </tr>
+            <tr>
+                <td>{{tweet.pk}}</td>
+                <td>{{tweet.content}}</td>
+                <td>{{tweet.created_at}}</td>
+            </tr>
+        </table>
+    </div>
 {% endblock %}
