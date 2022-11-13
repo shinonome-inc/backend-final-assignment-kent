@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
-
+from django.http import HttpResponseNotFound, HttpResponseForbidden
 from tweets.forms import TweetCreateForm
 from tweets.models import Tweet
 
@@ -20,13 +20,29 @@ class TweetCreateView(View):
 
 
 class TweetDetailView(View):
-    def get(self, request, pk, *args, **kwargs):
-        tweet = get_object_or_404(Tweet, pk=pk)
-        return render(request, "tweets_detail.html", {"tweet": tweet})
+    def get(self, request, *args, **kwargs):
+        tweet = get_object_or_404(
+            Tweet,
+            pk=kwargs.get("pk"),
+        )
+        if tweet is None:
+            return HttpResponseNotFound()
+        elif tweet.user != request.user:
+            return HttpResponseForbidden()
+        else:
+            return render(request, "tweets_detail.html", {"tweet": tweet})
 
 
 class TweetDeleteView(View):
-    def post(self, request, pk, *args, **kwargs):
-        tweet = get_object_or_404(Tweet, pk=pk)
-        tweet.delete()
-        return redirect("welcome:home")
+    def post(self, request, *args, **kwargs):
+        tweet = get_object_or_404(
+            Tweet,
+            pk=kwargs.get("pk"),
+        )
+        if tweet is None:
+            return HttpResponseNotFound()
+        elif tweet.user != request.user:
+            return HttpResponseForbidden()
+        else:
+            tweet.delete()
+            return redirect("welcome:home")
