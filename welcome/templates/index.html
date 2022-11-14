@@ -20,12 +20,14 @@
               <th>ID</th>
               <th>内容</th>
               <th>作成日</th>
+              <th>ユーザー</th>
           </tr>
           {% for tweet in tweets %}
             <tr>
               <td>{{ tweet.id }}</td>
               <td><a href={% url 'tweets:detail' tweet.pk %}>{{ tweet.content }}</a></td>
               <td>{{ tweet.created_at }}</td>
+              <td>{{ tweet.user }}</td>
             </tr>
           {% endfor %}
         </table>
