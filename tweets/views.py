@@ -1,6 +1,7 @@
+from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
-from django.http import HttpResponseNotFound, HttpResponseForbidden
+
 from tweets.forms import TweetCreateForm
 from tweets.models import Tweet
 
