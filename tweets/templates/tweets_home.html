@@ -6,8 +6,8 @@
 {% block body %}
   <h1>Backend Final Assignment</h1>
   <h2>
-    {% if request.user.is_authenticated %}
-      {{ user.username }}
+    {% if current_user.is_authenticated %}
+      {{ current_user.username }}
       <div>
         <a href="{% url 'accounts:signout' %}"><button>SignOut</button></a>
       </div>

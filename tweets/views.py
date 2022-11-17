@@ -10,7 +10,7 @@ class TweetHomeView(View):
     def get(self, request, *args, **kwargs):
         user = self.request.user if self.request.user.is_authenticated else None
         tweets = Tweet.objects.select_related("user").all()
-        context = {"user": user, "tweets": tweets}
+        context = {"current_user": user, "tweets": tweets}
         return render(request, "tweets_home.html", context)
 
 
