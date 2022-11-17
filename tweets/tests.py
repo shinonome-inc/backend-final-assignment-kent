@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import User
-from tweets.forms import TweetCreateForm
 from tweets.models import Tweet
 
 
@@ -28,10 +27,11 @@ class TestTweetCreateView(TestCase):
     def test_failure_post_with_empty_content(self):
         self.client.force_login(user=self.user)
         data = {"content": ""}
-        form = TweetCreateForm(data)
+        response = self.client.post(self.create_url, data)
+        form = response.context["form"]
         form.is_valid()
-        err_mes = "{'content': [ValidationError(['このフィールドは必須です。'])]}"
-        self.assertEqual(err_mes, str(form.errors.as_data()))
+        err_mes = "このフィールドは必須です。"
+        self.assertIn(err_mes, str(form.errors["content"]))
         response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, 200)
 
@@ -45,10 +45,11 @@ class TestTweetCreateView(TestCase):
             + " Excepteur sint occaecat cupidatat non proident,"
             + " sunt in culpa qui officia deserunt mollit anim id est laborum."
         }
-        form = TweetCreateForm(data)
+        response = self.client.post(self.create_url, data)
+        form = response.context["form"]
         form.is_valid()
-        err_mes = "{'content': [ValidationError(['この値は 140 文字以下でなければなりません( 445 文字になっています)。'])]}"
-        self.assertEqual(err_mes, str(form.errors.as_data()))
+        err_mes = "この値は 140 文字以下でなければなりません"
+        self.assertIn(err_mes, str(form.errors["content"]))
         response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, 200)
 
