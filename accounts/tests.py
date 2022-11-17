@@ -36,7 +36,8 @@ class TestSignUpView(TestCase):
             "password1": "",
             "password2": "",
         }
-        form = UserCreateForm(data)
+        response = self.client.post(self.signup_url, data)
+        form = response.context["form"]
         form.is_valid()
         err_mes = (
             "{'username': [ValidationError(['このフィールドは必須です。'])],"
@@ -56,10 +57,11 @@ class TestSignUpView(TestCase):
             "password1": "pass0000",
             "password2": "pass0000",
         }
-        form = UserCreateForm(data)
+        response = self.client.post(self.signup_url, data)
+        form = response.context["form"]
         form.is_valid()
-        err_mes = "{'username': [ValidationError(['このフィールドは必須です。'])]}"
-        self.assertEqual(err_mes, str(form.errors.as_data()))
+        err_mes = "このフィールドは必須です。"
+        self.assertIn(err_mes, str(form.errors.as_data()))
         response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
@@ -71,10 +73,11 @@ class TestSignUpView(TestCase):
             "password1": "pass0000",
             "password2": "pass0000",
         }
-        form = UserCreateForm(data)
+        response = self.client.post(self.signup_url, data)
+        form = response.context["form"]
         form.is_valid()
-        err_mes = "{'email': [ValidationError(['このフィールドは必須です。'])]}"
-        self.assertEqual(err_mes, str(form.errors.as_data()))
+        err_mes = "このフィールドは必須です。"
+        self.assertIn(err_mes, str(form.errors.as_data()))
         response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
@@ -86,13 +89,14 @@ class TestSignUpView(TestCase):
             "password1": "",
             "password2": "",
         }
-        form = UserCreateForm(data)
+        response = self.client.post(self.signup_url, data)
+        form = response.context["form"]
         form.is_valid()
         err_mes = (
             "{'password1': [ValidationError(['このフィールドは必須です。'])],"
             + " 'password2': [ValidationError(['このフィールドは必須です。'])]}"
         )
-        self.assertEqual(err_mes, str(form.errors.as_data()))
+        self.assertIn(err_mes, str(form.errors.as_data()))
         response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
@@ -107,10 +111,11 @@ class TestSignUpView(TestCase):
             "password1": "passcode0000",
             "password2": "passcode0000",
         }
-        form = UserCreateForm(data2)
+        response = self.client.post(self.signup_url, data2)
+        form = response.context["form"]
         form.is_valid()
-        err_mes = "{'username': [ValidationError(['同じユーザー名が既に登録済みです。'])]}"
-        self.assertEqual(err_mes, str(form.errors.as_data()))
+        err_mes = "同じユーザー名が既に登録済みです。"
+        self.assertIn(err_mes, str(form.errors.as_data()))
         response = self.client.post(self.signup_url, data2)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 1)
@@ -124,8 +129,8 @@ class TestSignUpView(TestCase):
         }
         form = UserCreateForm(data)
         form.is_valid()
-        err_mes = "{'email': [ValidationError(['有効なメールアドレスを入力してください。'])]}"
-        self.assertEqual(err_mes, str(form.errors.as_data()))
+        err_mes = "有効なメールアドレスを入力してください。"
+        self.assertIn(err_mes, str(form.errors.as_data()))
         response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
@@ -137,10 +142,11 @@ class TestSignUpView(TestCase):
             "password1": "passcd",
             "password2": "passcd",
         }
-        form = UserCreateForm(data)
+        response = self.client.post(self.signup_url, data)
+        form = response.context["form"]
         form.is_valid()
-        err_mes = "{'password2': [ValidationError(['このパスワードは短すぎます。最低 8 文字以上必要です。'])]}"
-        self.assertEqual(err_mes, str(form.errors.as_data()))
+        err_mes = "このパスワードは短すぎます。最低 8 文字以上必要です。"
+        self.assertIn(err_mes, str(form.errors.as_data()))
         response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
@@ -152,10 +158,11 @@ class TestSignUpView(TestCase):
             "password1": "testpscd",
             "password2": "testpscd",
         }
-        form = UserCreateForm(data)
+        response = self.client.post(self.signup_url, data)
+        form = response.context["form"]
         form.is_valid()
-        err_mes = "{'password2': [ValidationError(['このパスワードは ユーザー名 と似すぎています。'])]}"
-        self.assertEqual(err_mes, str(form.errors.as_data()))
+        err_mes = "このパスワードは ユーザー名 と似すぎています。"
+        self.assertIn(err_mes, str(form.errors.as_data()))
         response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
@@ -167,10 +174,11 @@ class TestSignUpView(TestCase):
             "password1": "20040326",
             "password2": "20040326",
         }
-        form = UserCreateForm(data)
+        response = self.client.post(self.signup_url, data)
+        form = response.context["form"]
         form.is_valid()
-        err_mes = "{'password2': [ValidationError(['このパスワードは数字しか使われていません。'])]}"
-        self.assertEqual(err_mes, str(form.errors.as_data()))
+        err_mes = "このパスワードは数字しか使われていません"
+        self.assertIn(err_mes, str(form.errors.as_data()))
         response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
@@ -182,10 +190,11 @@ class TestSignUpView(TestCase):
             "password1": "testpasscd",
             "password2": "testpassdc",
         }
-        form = UserCreateForm(data)
+        response = self.client.post(self.signup_url, data)
+        form = response.context["form"]
         form.is_valid()
-        err_mes = "{'password2': [ValidationError(['確認用パスワードが一致しません。'])]}"
-        self.assertEqual(err_mes, str(form.errors.as_data()))
+        err_mes = "確認用パスワードが一致しません。"
+        self.assertIn(err_mes, str(form.errors.as_data()))
         response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
