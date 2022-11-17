@@ -7,7 +7,7 @@
         {% csrf_token %}
         {% if request.user.is_authenticated %}
             {{ form.as_p }}
-            <input type="submit" id="save" value="save">
+            <input type="submit" id="save" >
         {% endif %}
     </form>
 {% endblock %}
