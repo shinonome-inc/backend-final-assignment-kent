@@ -10,8 +10,27 @@
       {{ user.username }}
       <div>
         <a href="{% url 'accounts:signout' %}"><button>SignOut</button></a>
+      </div>
+      <div>
         <a href="{% url 'tweets:create' %}"><button>Tweet!</button></a>
-        <a href="{% url 'tweets:home' %}"><button>ツイート一覧</button></a>
+      </div>
+      <div>
+        <table border="1">
+          <tr>
+              <th>ID</th>
+              <th>内容</th>
+              <th>作成日</th>
+              <th>ユーザー</th>
+          </tr>
+          {% for tweet in tweets %}
+            <tr>
+              <td>{{ tweet.id }}</td>
+              <td><a href={% url 'tweets:detail' tweet.pk %}>{{ tweet.content }}</a></td>
+              <td>{{ tweet.created_at }}</td>
+              <td>{{ tweet.user }}</td>
+            </tr>
+          {% endfor %}
+        </table>
       </div>
     {% else %}
       現在ログインしていません
