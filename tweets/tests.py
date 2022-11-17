@@ -85,7 +85,7 @@ class TestTweetDeleteView(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("welcome:home"), 302, 200)
-        self.assertIsNone(Tweet.objects.filter(pk=self.tweet_id).first())
+        self.assertFalse(Tweet.objects.filter(pk=self.tweet_id).exists())
 
     def test_failure_post_with_not_exist_tweet(self):
         response = self.client.post(
@@ -97,7 +97,7 @@ class TestTweetDeleteView(TestCase):
         )
 
     def test_failure_post_with_incorrect_user(self):
-        incorrect_user = self.user = User.objects.create_user(
+        incorrect_user = User.objects.create_user(
             username="incorrect_user", email="fuga@email.com", password="testpass0000"
         )
         self.client.force_login(user=incorrect_user)
