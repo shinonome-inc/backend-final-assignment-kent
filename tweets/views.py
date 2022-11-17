@@ -38,8 +38,7 @@ class TweetDetailView(View):
             return HttpResponseNotFound()
         elif tweet.user != request.user:
             return HttpResponseForbidden()
-        else:
-            return render(request, "tweets_detail.html", {"tweet": tweet})
+        return render(request, "tweets_detail.html", {"tweet": tweet})
 
 
 class TweetDeleteView(View):
