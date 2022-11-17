@@ -34,9 +34,7 @@ class TweetDetailView(View):
             Tweet,
             pk=kwargs.get("pk"),
         )
-        if tweet is None:
-            return HttpResponseNotFound()
-        elif tweet.user != request.user:
+        if tweet.user != request.user:
             return HttpResponseForbidden()
         return render(request, "tweets_detail.html", {"tweet": tweet})
 
@@ -47,10 +45,11 @@ class TweetDeleteView(View):
             Tweet,
             pk=kwargs.get("pk"),
         )
-        if tweet is None:
-            return HttpResponseNotFound()
-        elif tweet.user != request.user:
+        print(
+            "------------------------------------------------------------------------------"
+        )
+        if tweet.user != request.user:
             return HttpResponseForbidden()
         else:
             tweet.delete()
-            return redirect("welcome:home")
+        return redirect("welcome:home")
