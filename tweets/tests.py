@@ -30,8 +30,8 @@ class TestTweetCreateView(TestCase):
         data = {"content": ""}
         form = TweetCreateForm(data)
         form.is_valid()
-        e_mes = "{'content': [ValidationError(['このフィールドは必須です。'])]}"
-        self.assertEqual(e_mes, str(form.errors.as_data()))
+        err_mes = "{'content': [ValidationError(['このフィールドは必須です。'])]}"
+        self.assertEqual(err_mes, str(form.errors.as_data()))
         response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, 200)
 
@@ -47,8 +47,8 @@ class TestTweetCreateView(TestCase):
         }
         form = TweetCreateForm(data)
         form.is_valid()
-        e_mes = "{'content': [ValidationError(['この値は 140 文字以下でなければなりません( 445 文字になっています)。'])]}"
-        self.assertEqual(e_mes, str(form.errors.as_data()))
+        err_mes = "{'content': [ValidationError(['この値は 140 文字以下でなければなりません( 445 文字になっています)。'])]}"
+        self.assertEqual(err_mes, str(form.errors.as_data()))
         response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, 200)
 
