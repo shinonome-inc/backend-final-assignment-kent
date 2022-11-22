@@ -45,9 +45,6 @@ class TweetDeleteView(View):
             Tweet,
             pk=kwargs.get("pk"),
         )
-        print(
-            "------------------------------------------------------------------------------"
-        )
         if tweet.user != request.user:
             return HttpResponseForbidden()
         else:
