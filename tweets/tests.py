@@ -32,7 +32,6 @@ class TestTweetCreateView(TestCase):
         form.is_valid()
         err_mes = "このフィールドは必須です。"
         self.assertIn(err_mes, str(form.errors["content"]))
-        response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, 200)
 
     def test_failure_post_with_too_long_content(self):
