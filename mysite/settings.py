@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os.path
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,7 +27,6 @@ SECRET_KEY = "django-insecure-x+hlabr82)0gfep+bo%6nsehz_n%5_w4*9u*pd9tllw10dj1s1
 DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1", "testserver"]
-
 
 # Application definition
 
@@ -57,7 +57,9 @@ ROOT_URLCONF = "mysite.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            os.path.join(BASE_DIR, "templates/"),
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
