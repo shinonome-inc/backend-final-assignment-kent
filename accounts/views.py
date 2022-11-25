@@ -21,7 +21,7 @@ class SignUpView(View):
             return redirect(reverse("welcome:home"))
         return render(
             request,
-            "signup.html",
+            "accounts/signup.html",
             {
                 "form": form,
             },
@@ -31,7 +31,7 @@ class SignUpView(View):
         form = UserCreateForm(request.POST)
         return render(
             request,
-            "signup.html",
+            "accounts/signup.html",
             {
                 "form": form,
             },
@@ -54,10 +54,10 @@ class SignInView(View):
             else:
                 return render(request, "signin.html", {"context": "ログインに失敗しました"})
         else:
-            return render(request, "signin.html", {"context": "formが無効です"})
+            return render(request, "accounts/signin.html", {"context": "formが無効です"})
 
     def get(self, request, *args, **kwargs):
-        template_name = "signin.html"
+        template_name = "accounts/signin.html"
         form = UserSignInForm()
         return render(request, template_name, {"form": form})
 

@@ -39,13 +39,14 @@ class TestSignUpView(TestCase):
         response = self.client.post(self.signup_url, data)
         form = response.context["form"]
         form.is_valid()
-        err_mes = (
-            "{'username': [ValidationError(['このフィールドは必須です。'])],"
-            + " 'email': [ValidationError(['このフィールドは必須です。'])],"
-            + " 'password1': [ValidationError(['このフィールドは必須です。'])],"
-            + " 'password2': [ValidationError(['このフィールドは必須です。'])]}"
+        err_messages = (
+            "'username': [ValidationError(['このフィールドは必須です。'])],",
+            "'email': [ValidationError(['このフィールドは必須です。'])],",
+            "'password1': [ValidationError(['このフィールドは必須です。'])],",
+            "'password2': [ValidationError(['このフィールドは必須です。'])]}",
         )
-        self.assertEqual(err_mes, str(form.errors.as_data()))
+        for err_mes in err_messages:
+            self.assertIn(err_mes, str(form.errors.as_data()))
         response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)

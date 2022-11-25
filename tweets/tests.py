@@ -29,10 +29,8 @@ class TestTweetCreateView(TestCase):
         data = {"content": ""}
         response = self.client.post(self.create_url, data)
         form = response.context["form"]
-        form.is_valid()
         err_mes = "このフィールドは必須です。"
-        self.assertIn(err_mes, str(form.errors["content"]))
-        response = self.client.post(self.create_url, data)
+        self.assertIn(err_mes, form.errors["content"])
         self.assertEqual(response.status_code, 200)
 
     def test_failure_post_with_too_long_content(self):
@@ -66,7 +64,7 @@ class TestTweetDetailView(TestCase):
         tweet_pk = self.tweet.pk
         response = self.client.get(reverse("tweets:detail", kwargs={"pk": tweet_pk}))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "tweets_detail.html")
+        self.assertTemplateUsed(response, "tweets/tweets_detail.html")
         self.assertEqual(response.context["tweet"], self.tweet)
 
 
