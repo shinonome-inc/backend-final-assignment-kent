@@ -8,9 +8,8 @@ from tweets.models import Tweet
 
 class TweetHomeView(View):
     def get(self, request, *args, **kwargs):
-        user = self.request.user if self.request.user.is_authenticated else None
         tweets = Tweet.objects.select_related("user").all()
-        context = {"current_user": user, "tweets": tweets}
+        context = {"tweets": tweets}
         return render(request, "tweets/tweets_home.html", context)
 
 
