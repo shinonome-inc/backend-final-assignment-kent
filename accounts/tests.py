@@ -39,14 +39,9 @@ class TestSignUpView(TestCase):
         response = self.client.post(self.signup_url, data)
         form = response.context["form"]
         form.is_valid()
-        err_messages = (
-            "'username': [ValidationError(['このフィールドは必須です。'])],",
-            "'email': [ValidationError(['このフィールドは必須です。'])],",
-            "'password1': [ValidationError(['このフィールドは必須です。'])],",
-            "'password2': [ValidationError(['このフィールドは必須です。'])]}",
-        )
-        for err_mes in err_messages:
-            self.assertIn(err_mes, str(form.errors.as_data()))
+        err_mes = "このフィールドは必須です。"
+        for val in form.errors.as_data().values():
+            self.assertIn(err_mes, str(val))
         response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
@@ -93,11 +88,9 @@ class TestSignUpView(TestCase):
         response = self.client.post(self.signup_url, data)
         form = response.context["form"]
         form.is_valid()
-        err_mes = (
-            "{'password1': [ValidationError(['このフィールドは必須です。'])],"
-            + " 'password2': [ValidationError(['このフィールドは必須です。'])]}"
-        )
-        self.assertIn(err_mes, str(form.errors.as_data()))
+        err_mes = "このフィールドは必須です。"
+        for val in form.errors.as_data().values():
+            self.assertIn(err_mes, str(val))
         response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
