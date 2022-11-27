@@ -6,8 +6,14 @@
 {% block body %}
   <h1>Backend Final Assignment</h1>
   <h2>
-    {% if current_user.is_authenticated %}
-      {{ current_user.username }}
+    {% if request.user.is_anonymous %}
+    現在ログインしていません
+    <div>
+      <a href="{% url 'accounts:signup' %}"><button>SignUp</button></a>
+      <a href="{% url 'accounts:signin' %}"><button>SignIn</button></a>
+    </div>
+    {% else %}
+      {{ request.user.username }}
       <div>
         <a href="{% url 'accounts:signout' %}"><button>SignOut</button></a>
       </div>
@@ -31,12 +37,6 @@
             </tr>
           {% endfor %}
         </table>
-      </div>
-    {% else %}
-      現在ログインしていません
-      <div>
-        <a href="{% url 'accounts:signup' %}"><button>SignUp</button></a>
-        <a href="{% url 'accounts:signin' %}"><button>SignIn</button></a>
       </div>
     {% endif %}
   </h2>
