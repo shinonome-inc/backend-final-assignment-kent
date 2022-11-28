@@ -30,10 +30,12 @@
             <td>{{ tweet.created_at }}</td>
             <td>{{ tweet.user }}</td>
             <td>
-              <form action="{% url 'tweets:delete' tweet.id %}" method="POST">
-                {% csrf_token %}
-                <button type="submit">削除</button>
-            </form>
+              {% if tweet.user == request.user %}
+                <form action="{% url 'tweets:delete' tweet.id %}" method="POST">
+                  {% csrf_token %}
+                  <button type="submit">削除</button>
+                </form>
+              {% endif %}
             </td>
           </tr>
         {% endfor %}
