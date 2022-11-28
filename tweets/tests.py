@@ -30,7 +30,8 @@ class TestTweetCreateView(TestCase):
         response = self.client.post(self.create_url, data)
         form = response.context["form"]
         err_mes = "このフィールドは必須です。"
-        self.assertIn(err_mes, form.errors["content"])
+        for key in form.errors.as_data().keys():
+            self.assertIn(err_mes, form.errors[key])
         self.assertEqual(response.status_code, 200)
 
     def test_failure_post_with_too_long_content(self):
@@ -46,7 +47,8 @@ class TestTweetCreateView(TestCase):
         response = self.client.post(self.create_url, data)
         form = response.context["form"]
         err_mes = "この値は 140 文字以下でなければなりません( 445 文字になっています)。"
-        self.assertIn(err_mes, form.errors["content"])
+        for key in form.errors.as_data().keys():
+            self.assertIn(err_mes, form.errors[key])
         response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, 200)
 
