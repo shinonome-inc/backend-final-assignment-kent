@@ -46,6 +46,5 @@ class TweetDeleteView(View):
         )
         if tweet.user != request.user:
             return HttpResponseForbidden()
-        else:
-            tweet.delete()
+        tweet.delete()
         return redirect("welcome:home")
