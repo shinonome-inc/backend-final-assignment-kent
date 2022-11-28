@@ -18,7 +18,7 @@
   ],
   "[python]": {
     "editor.tabSize": 4,
-    "editor.defaultFormatter": "trunk.io"
+    "editor.defaultFormatter": "ms-python.python"
   },
   "python.analysis.typeCheckingMode": "off"
 }
