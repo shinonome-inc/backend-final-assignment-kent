@@ -15,7 +15,7 @@ class TweetHomeView(View):
 
 class TweetCreateView(View):
     def get(self, request, *args, **kwargs):
-        form = TweetCreateForm(request.POST)
+        form = TweetCreateForm()
         return render(request, "tweets/tweets_create.html", {"form": form})
 
     def post(self, request, *args, **kwargs):
