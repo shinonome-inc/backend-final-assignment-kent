@@ -38,7 +38,6 @@ class TestSignUpView(TestCase):
         }
         response = self.client.post(self.signup_url, data)
         form = response.context["form"]
-        form.is_valid()
         err_mes = "このフィールドは必須です。"
         for key in form.errors.as_data().keys():
             self.assertIn(err_mes, form.errors[key])
@@ -55,7 +54,6 @@ class TestSignUpView(TestCase):
         }
         response = self.client.post(self.signup_url, data)
         form = response.context["form"]
-        form.is_valid()
         err_mes = "このフィールドは必須です。"
         for key in form.errors.as_data().keys():
             self.assertIn(err_mes, form.errors[key])
@@ -72,7 +70,6 @@ class TestSignUpView(TestCase):
         }
         response = self.client.post(self.signup_url, data)
         form = response.context["form"]
-        form.is_valid()
         err_mes = "このフィールドは必須です。"
         for key in form.errors.as_data().keys():
             self.assertIn(err_mes, form.errors[key])
@@ -89,7 +86,6 @@ class TestSignUpView(TestCase):
         }
         response = self.client.post(self.signup_url, data)
         form = response.context["form"]
-        form.is_valid()
         err_mes = "このフィールドは必須です。"
         for key in form.errors.as_data().keys():
             self.assertIn(err_mes, form.errors[key])
@@ -109,7 +105,6 @@ class TestSignUpView(TestCase):
         }
         response = self.client.post(self.signup_url, data2)
         form = response.context["form"]
-        form.is_valid()
         err_mes = "同じユーザー名が既に登録済みです。"
         for key in form.errors.as_data().keys():
             self.assertIn(err_mes, form.errors[key])
@@ -125,7 +120,6 @@ class TestSignUpView(TestCase):
             "password2": "test0000",
         }
         form = UserCreateForm(data)
-        form.is_valid()
         err_mes = "有効なメールアドレスを入力してください。"
         for key in form.errors.as_data().keys():
             self.assertIn(err_mes, form.errors[key])
@@ -142,7 +136,6 @@ class TestSignUpView(TestCase):
         }
         response = self.client.post(self.signup_url, data)
         form = response.context["form"]
-        form.is_valid()
         err_mes = "このパスワードは短すぎます。最低 8 文字以上必要です。"
         for key in form.errors.as_data().keys():
             self.assertIn(err_mes, form.errors[key])
@@ -159,7 +152,6 @@ class TestSignUpView(TestCase):
         }
         response = self.client.post(self.signup_url, data)
         form = response.context["form"]
-        form.is_valid()
         err_mes = "このパスワードは ユーザー名 と似すぎています。"
         for key in form.errors.as_data().keys():
             self.assertIn(err_mes, form.errors[key])
@@ -176,7 +168,6 @@ class TestSignUpView(TestCase):
         }
         response = self.client.post(self.signup_url, data)
         form = response.context["form"]
-        form.is_valid()
         err_mes = "このパスワードは数字しか使われていません。"
         for key in form.errors.as_data().keys():
             self.assertIn(err_mes, form.errors[key])
@@ -193,7 +184,6 @@ class TestSignUpView(TestCase):
         }
         response = self.client.post(self.signup_url, data)
         form = response.context["form"]
-        form.is_valid()
         err_mes = "確認用パスワードが一致しません。"
         for key in form.errors.as_data().keys():
             self.assertIn(err_mes, form.errors[key])
