@@ -1,34 +1,111 @@
 from django.test import TestCase
+from django.urls import reverse
+
+from accounts.models import User
+from tweets.models import Tweet
 
 
 class TestTweetCreateView(TestCase):
+    def setUp(self):
+        self.signup_url = reverse("accounts:signup")
+        self.create_url = reverse("tweets:create")
+        self.home_url = reverse("welcome:home")
+        self.user = User.objects.create_user(
+            username="test", email="hoge@email.com", password="testpass0000"
+        )
+
     def test_success_get(self):
-        pass
+        response = self.client.get(self.create_url)
+        self.assertEqual(response.status_code, 200)
 
     def test_success_post(self):
-        pass
+        self.client.force_login(user=self.user)
+        data = {"content": "Hello, world!"}
+        response = self.client.post(self.create_url, data)
+        self.assertRedirects(response, self.home_url, 302, 200)
 
     def test_failure_post_with_empty_content(self):
-        pass
+        self.client.force_login(user=self.user)
+        data = {"content": ""}
+        response = self.client.post(self.create_url, data)
+        form = response.context["form"]
+        expected_errs = {"content": "このフィールドは必須です。"}
+        for key, message in expected_errs.items():
+            self.assertIn(message, form.errors[key])
+        self.assertEqual(response.status_code, 200)
 
     def test_failure_post_with_too_long_content(self):
-        pass
+        self.client.force_login(user=self.user)
+        data = {
+            "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit,"
+            + " sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,"
+            + " quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+            + " Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+            + " Excepteur sint occaecat cupidatat non proident,"
+            + " sunt in culpa qui officia deserunt mollit anim id est laborum."
+        }
+        response = self.client.post(self.create_url, data)
+        form = response.context["form"]
+        expected_errs = {
+            "content": "この値は 140 文字以下でなければなりません( 445 文字になっています)。",
+        }
+        for key, message in expected_errs.items():
+            self.assertIn(message, form.errors[key])
+        response = self.client.post(self.create_url, data)
+        self.assertEqual(response.status_code, 200)
 
 
 class TestTweetDetailView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="test_user", email="hoge@email.com", password="testpass0000"
+        )
+        self.client.force_login(user=self.user)
+        self.tweet = Tweet.objects.create(content="test_tweet", user=self.user)
+
     def test_success_get(self):
-        pass
+        tweet_pk = self.tweet.pk
+        response = self.client.get(reverse("tweets:detail", kwargs={"pk": tweet_pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "tweets/tweets_detail.html")
+        self.assertEqual(response.context["tweet"], self.tweet)
 
 
 class TestTweetDeleteView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="test_user", email="hoge@email.com", password="testpass0000"
+        )
+        self.client.force_login(user=self.user)
+        self.tweet = Tweet.objects.create(content="test_tweet", user=self.user)
+        self.tweet_id = self.tweet.pk
+
     def test_success_post(self):
-        pass
+        response = self.client.post(
+            reverse("tweets:delete", kwargs={"pk": self.tweet_id})
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("welcome:home"), 302, 200)
+        self.assertFalse(Tweet.objects.filter(pk=self.tweet_id).exists())
 
     def test_failure_post_with_not_exist_tweet(self):
-        pass
+        response = self.client.post(
+            reverse("tweets:delete", kwargs={"pk": self.tweet_id + 1})
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertIn(
+            b"The requested resource was not found on this server.", response.content
+        )
 
     def test_failure_post_with_incorrect_user(self):
-        pass
+        incorrect_user = User.objects.create_user(
+            username="incorrect_user", email="fuga@email.com", password="testpass0000"
+        )
+        self.client.force_login(user=incorrect_user)
+        response = self.client.post(
+            reverse("tweets:delete", kwargs={"pk": self.tweet_id})
+        )
+        self.assertEqual(response.status_code, 403)
 
 
 class TestFavoriteView(TestCase):

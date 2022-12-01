@@ -1,11 +1,5 @@
-from django.shortcuts import render
-
-# Create your views here.
-from django.views.generic import View
+from django.views.generic import TemplateView
 
 
-class WelcomeView(View):
-    def get(self, request, *args, **kwargs):
-        user = self.request.user
-        context = {"user": user}
-        return render(request, "index.html", context)
+class WelcomeHomeView(TemplateView):
+    template_name = "welcome/index.html"

@@ -10,6 +10,8 @@
       {{ user.username }}
       <div>
         <a href="{% url 'accounts:signout' %}"><button>SignOut</button></a>
+        <a href="{% url 'tweets:create' %}"><button>Tweet!</button></a>
+        <a href="{% url 'tweets:home' %}"><button>ツイート一覧</button></a>
       </div>
     {% else %}
       現在ログインしていません
