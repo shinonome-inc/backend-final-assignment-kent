@@ -64,3 +64,43 @@ class SignInView(View):
 
 class SignOutView(LogoutView):
     pass
+
+
+class UserProfileView(View):
+    def post(self, request, *args, **kwargs):
+        pass
+
+    def get(self, request, *args, **kwargs):
+        pass
+
+
+class FollowView(View):
+    def post(self, request, *args, **kwargs):
+        pass
+
+    def get(self, request, *args, **kwargs):
+        pass
+
+
+class UnfollowView(View):
+    def post(self, request, *args, **kwargs):
+        pass
+
+    def get(self, request, *args, **kwargs):
+        pass
+
+
+class FollowingListView(View):
+    def post(self, request, *args, **kwargs):
+        pass
+
+    def get(self, request, *args, **kwargs):
+        pass
+
+
+class FollowerListView(View):
+    def post(self, request, *args, **kwargs):
+        pass
+
+    def get(self, request, *args, **kwargs):
+        pass
