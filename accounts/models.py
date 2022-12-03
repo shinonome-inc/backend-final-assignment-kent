@@ -7,14 +7,17 @@ class User(AbstractUser):
 
 
 class FriendShip(models.Model):
+    # フォロー関係：follower→followee
+    # フォローするユーザー
     follower = models.ForeignKey(
         User, related_name="follower", on_delete=models.CASCADE
     )
-    following = models.ForeignKey(
-        User, related_name="following", on_delete=models.CASCADE
+    # フォローさせるユーザー
+    followee = models.ForeignKey(
+        User, related_name="followee", on_delete=models.CASCADE
     )
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.follower.username} : {self.following.username}"
+        return f"{self.follower.username} : {self.followee.username}"
