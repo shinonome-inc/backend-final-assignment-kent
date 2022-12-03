@@ -269,8 +269,17 @@ class TestLogoutView(TestCase):
 
 
 class TestUserProfileView(TestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username="test", password="testpasscd", email="hoge@email.com"
+        )
+        self.client.force_login(self.user)
+
     def test_success_get(self):
-        pass
+        response = self.client.get(
+            reverse("accounts:profile", kwargs={"username": self.user.username})
+        )
+        self.assertEqual(response.status_code, 200)
 
 
 class TestUserProfileEditView(TestCase):
