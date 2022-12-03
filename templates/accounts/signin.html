@@ -6,10 +6,12 @@
 <h1>SignIn</h1>
 
 <form method="POST" action="">
-    {{ context }}
     {% csrf_token %}
+    {{ context }}
     {{ form.as_p }}
-    <input type="submit" id="save"/>
+    {{form.non_field_errors}}
+    {% if not form.non_field_errors %}
+        <input type="submit" id="save"/>
+    {% endif %}
 </form>
-
 {% endblock %}
