@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.views.generic import View
 
 from accounts.forms import UserCreateForm, UserSignInForm
+from accounts.models import FriendShip, User
 
 
 class SignUpView(View):
@@ -52,9 +53,17 @@ class SignInView(View):
                 login(request, user)
                 return redirect(settings.LOGIN_REDIRECT_URL)
             else:
-                return render(request, "signin.html", {"context": "ログインに失敗しました"})
+                return render(
+                    request,
+                    "signin.html",
+                    {"context": "ログインに失敗しました", "error_occured": False},
+                )
         else:
-            return render(request, "accounts/signin.html", {"context": "formが無効です"})
+            return render(
+                request,
+                "accounts/signin.html",
+                {"context": "formが無効です", "error_occured": True},
+            )
 
     def get(self, request, *args, **kwargs):
         template_name = "accounts/signin.html"
@@ -67,6 +76,22 @@ class SignOutView(LogoutView):
 
 
 class UserProfileView(View):
+    def get(self, request, *args, **kwargs):
+        username = kwargs.get("username")
+        requested_user = User.objects.get(username=username)
+        follower_frindship_records = FriendShip.objects.filter(followee=requested_user)
+        followee_friendship_records = FriendShip.objects.filter(follower=requested_user)
+        follower_users = [
+            follower_record.followee for follower_record in follower_frindship_records
+        ]
+        followee_users = [
+            followee_record.follower for followee_record in followee_friendship_records
+        ]
+        context = {"followers": follower_users, "followees": followee_users}
+        return render(request, "accounts/userprofile.html", context)
+
+
+class UserProfileEditView(View):
     def post(self, request, *args, **kwargs):
         pass
 
@@ -90,15 +115,23 @@ class UnfollowView(View):
         pass
 
 
-class FollowingListView(View):
-    def post(self, request, *args, **kwargs):
-        pass
+# class FollowingListView(View):
+#    def post(self, request, *args, **kwargs):
+#        pass
+#
+#    def get(self, request, *args, **kwargs):
+#        pass
+#
+#
+# class FollowerListView(View):
+#    def post(self, request, *args, **kwargs):
+#        pass
+#
+#    def get(self, request, *args, **kwargs):
+#        pass
 
-    def get(self, request, *args, **kwargs):
-        pass
 
-
-class FollowerListView(View):
+class UnFollowView(View):
     def post(self, request, *args, **kwargs):
         pass
 
