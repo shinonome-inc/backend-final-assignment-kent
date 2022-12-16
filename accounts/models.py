@@ -8,11 +8,11 @@ class User(AbstractUser):
 
 class FriendShip(models.Model):
     # フォロー関係：follower→followee
-    # フォローするユーザー
+    # フォローをするユーザー
     follower = models.ForeignKey(
         User, related_name="follower", on_delete=models.CASCADE
     )
-    # フォローさせるユーザー
+    # フォロー対象のユーザー
     followee = models.ForeignKey(
         User, related_name="followee", on_delete=models.CASCADE
     )
