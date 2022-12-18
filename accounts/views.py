@@ -4,6 +4,7 @@ from django.contrib.auth.views import LogoutView
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from django.views.generic import View
+from django.http import HttpResponse
 
 from accounts.forms import UserCreateForm, UserSignInForm
 from accounts.models import FriendShip, User
@@ -102,16 +103,20 @@ class FollowView(View):
     def post(self, request, *args, **kwargs):
         followee_record = get_object_or_404(User, username=kwargs.get("username"))
         follower_record = request.user
+        if followee_record == request.user:
+            response = HttpResponse(b"You can't follow yourself.")
+            return response
         FriendShip.objects.create(follower=follower_record, followee=followee_record)
         return redirect(reverse("welcome:home"))
 
 
 class UnfollowView(View):
     def post(self, request, *args, **kwargs):
-        followee_record = User.objects.get(username=kwargs.get("username"))
-        if followee_record is None:
-            return None
+        followee_record = get_object_or_404(User, username=kwargs.get("username"))
         follower_record = request.user
+        if followee_record == request.user:
+            response = HttpResponse(b"You can't follow yourself.")
+            return response
         friendship_record = FriendShip.objects.get(
             follower=follower_record, followee=followee_record
         )
@@ -119,25 +124,27 @@ class UnfollowView(View):
         return redirect(reverse("welcome:home"))
 
 
-class FollowingListView(View):
-    def post(self, request, *args, **kwargs):
-        pass
-
+class FolloweeListView(View):
     def get(self, request, *args, **kwargs):
-        pass
+        # TODO: フォローしているユーザーの一覧を表示する(HTMLのパスが不正)
+        return render(
+            request,
+            "accounts/followee_list.html",
+            {
+                "user": request.user,
+                "friendships": FriendShip.objects.filter(follower=request.user).all(),
+            },
+        )
 
 
 class FollowerListView(View):
-    def post(self, request, *args, **kwargs):
-        pass
-
     def get(self, request, *args, **kwargs):
-        pass
-
-
-class UnFollowView(View):
-    def post(self, request, *args, **kwargs):
-        pass
-
-    def get(self, request, *args, **kwargs):
-        pass
+        # TODO: フォローされているユーザーの一覧を表示する(HTMLのパスが不正)
+        return render(
+            request,
+            "accounts/followee_list.html",
+            {
+                "user": request.user,
+                "friendships": FriendShip.objects.filter(followee=request.user).all(),
+            },
+        )
