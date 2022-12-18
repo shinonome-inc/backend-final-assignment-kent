@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.views import LogoutView
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from django.views.generic import View
 
@@ -77,8 +77,7 @@ class SignOutView(LogoutView):
 
 class UserProfileView(View):
     def get(self, request, *args, **kwargs):
-        username = kwargs.get("username")
-        requested_user = User.objects.get(username=username)
+        requested_user = get_object_or_404(User, username=kwargs.get("username"))
         follower_frindship_records = FriendShip.objects.filter(followee=requested_user)
         followee_friendship_records = FriendShip.objects.filter(follower=requested_user)
         follower_users = [
@@ -101,18 +100,23 @@ class UserProfileEditView(View):
 
 class FollowView(View):
     def post(self, request, *args, **kwargs):
-        pass
-
-    def get(self, request, *args, **kwargs):
-        pass
+        followee_record = get_object_or_404(User, username=kwargs.get("username"))
+        follower_record = request.user
+        FriendShip.objects.create(follower=follower_record, followee=followee_record)
+        return redirect(reverse("welcome:home"))
 
 
 class UnfollowView(View):
     def post(self, request, *args, **kwargs):
-        pass
-
-    def get(self, request, *args, **kwargs):
-        pass
+        followee_record = User.objects.get(username=kwargs.get("username"))
+        if followee_record is None:
+            return None
+        follower_record = request.user
+        friendship_record = FriendShip.objects.get(
+            follower=follower_record, followee=followee_record
+        )
+        friendship_record.delete()
+        return redirect(reverse("welcome:home"))
 
 
 class FollowingListView(View):
