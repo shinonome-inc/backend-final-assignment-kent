@@ -20,4 +20,4 @@ class FriendShip(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.follower.username} : {self.followee.username}"
+        return f'"{self.follower.username}" follows "{self.followee.username}"'
