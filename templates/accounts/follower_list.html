@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title%} サインアップ {%endblock%}
+
+{% block body %}
+    <h1>Follower List</h1>
+    <table border="1">
+        <tr>
+            <td>フォロワー</td>
+        </tr>
+        {% for friendship in friendships %}
+            <tr>
+                <td>{{ friendship.follower.username }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
