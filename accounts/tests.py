@@ -3,8 +3,8 @@ from django.contrib.auth import SESSION_KEY
 from django.test import TestCase
 from django.urls import reverse
 
-from accounts.forms import UserCreateForm, UserSignInForm
-from accounts.models import User
+from accounts.forms import UserSignInForm
+from accounts.models import User, FriendShip
 
 
 class TestSignUpView(TestCase):
@@ -46,7 +46,6 @@ class TestSignUpView(TestCase):
         }
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -64,7 +63,6 @@ class TestSignUpView(TestCase):
         }
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -82,7 +80,6 @@ class TestSignUpView(TestCase):
         }
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -101,7 +98,6 @@ class TestSignUpView(TestCase):
         }
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -109,18 +105,17 @@ class TestSignUpView(TestCase):
         User.objects.create_user(
             username="test", email="fuga@email.com", password="passcode0000"
         )
-        data2 = {
+        duplicated_data = {
             "username": "test",
             "email": "fuga@email.com",
             "password1": "passcode0000",
             "password2": "passcode0000",
         }
-        response = self.client.post(self.signup_url, data2)
+        response = self.client.post(self.signup_url, duplicated_data)
         form = response.context["form"]
         expected_errs = {"username": "同じユーザー名が既に登録済みです。"}
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data2)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 1)
 
@@ -131,11 +126,11 @@ class TestSignUpView(TestCase):
             "password1": "test0000",
             "password2": "test0000",
         }
-        form = UserCreateForm(data)
+        response = self.client.post(self.signup_url, data)
+        form = response.context["form"]
         expected_errs = {"email": "有効なメールアドレスを入力してください。"}
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -151,7 +146,6 @@ class TestSignUpView(TestCase):
         expected_errs = {"password2": "このパスワードは短すぎます。最低 8 文字以上必要です。"}
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -167,7 +161,6 @@ class TestSignUpView(TestCase):
         expected_errs = {"password2": "このパスワードは ユーザー名 と似すぎています。"}
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -183,7 +176,6 @@ class TestSignUpView(TestCase):
         expected_errs = {"password2": "このパスワードは数字しか使われていません。"}
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -199,7 +191,6 @@ class TestSignUpView(TestCase):
         expected_errs = {"password2": "確認用パスワードが一致しません。"}
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -297,11 +288,39 @@ class TestUserProfileEditView(TestCase):
 
 
 class TestFollowView(TestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username="test", password="testpasscd", email="hoge@email.com"
+        )
+        self.followee = User.objects.create_user(
+            username="followee", password="testpasscd", email="hoge@email.com"
+        )
+        self.client.force_login(self.user)
+
     def test_success_post(self):
-        pass
+        response = self.client.post(
+            reverse("accounts:follow", kwargs={"username": self.followee.username})
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "welcome:home",
+            ),
+            302,
+            200,
+        )
+        added_record = FriendShip.objects.get(
+            followee=self.followee, follower=self.user
+        )
+        self.assertIsNotNone(added_record)
 
     def test_failure_post_with_not_exist_user(self):
-        pass
+        response = self.client.post(
+            reverse("accounts:follow", kwargs={"username": "unexist_user"})
+        )
+        self.assertEqual(response.status_code, 404)
+        expected_err = b"The requested resource was not found on this server."
+        self.assertIn(expected_err, response.content)
 
     def test_failure_post_with_self(self):
         pass
