@@ -259,18 +259,18 @@ class TestLogoutView(TestCase):
         self.assertNotIn(SESSION_KEY, self.client.session)
 
 
-class TestUserProfileView(TestCase):
-    def setUp(self) -> None:
-        self.user = User.objects.create_user(
-            username="test", password="testpasscd", email="hoge@email.com"
-        )
-        self.client.force_login(self.user)
-
-    def test_success_get(self):
-        response = self.client.get(
-            reverse("accounts:profile", kwargs={"username": self.user.username})
-        )
-        self.assertEqual(response.status_code, 200)
+# class TestUserProfileView(TestCase):
+#    def setUp(self) -> None:
+#        self.user = User.objects.create_user(
+#            username="test", password="testpasscd", email="hoge@email.com"
+#        )
+#        self.client.force_login(self.user)
+#
+#    def test_success_get(self):
+#        response = self.client.get(
+#            reverse("accounts:profile", kwargs={"username": self.user.username})
+#        )
+#        self.assertEqual(response.status_code, 200)
 
 
 class TestUserProfileEditView(TestCase):
@@ -290,12 +290,13 @@ class TestUserProfileEditView(TestCase):
 class TestFollowView(TestCase):
     def setUp(self) -> None:
         self.user = User.objects.create_user(
-            username="test", password="testpasscd", email="hoge@email.com"
-        )
-        self.followee = User.objects.create_user(
-            username="followee", password="testpasscd", email="hoge@email.com"
+            username="follower_user", password="testpasscd", email="hoge@email.com"
         )
         self.client.force_login(self.user)
+        self.followee = User.objects.create_user(
+            username="followee_user", password="testpasscd", email="hoge@email.com"
+        )
+        self.pre_count = FriendShip.objects.count()
 
     def test_success_post(self):
         response = self.client.post(
@@ -321,20 +322,63 @@ class TestFollowView(TestCase):
         self.assertEqual(response.status_code, 404)
         expected_err = b"The requested resource was not found on this server."
         self.assertIn(expected_err, response.content)
+        post_count = FriendShip.objects.count()
+        self.assertEqual(self.pre_count, post_count)
 
     def test_failure_post_with_self(self):
-        pass
+        response = self.client.post(
+            reverse("accounts:follow", kwargs={"username": self.user.username})
+        )
+        self.assertEqual(response.status_code, 200)
+        expected_err = b"You can't follow yourself."
+        self.assertIn(expected_err, response.content)
 
 
 class TestUnfollowView(TestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username="user", password="testpasscd", email="hoge@email.com"
+        )
+        self.client.force_login(self.user)
+        self.followee = User.objects.create_user(
+            username="followee_user", password="testpasscd", email="hoge@email.com"
+        )
+        self.target_frienship = FriendShip.objects.create(
+            followee=self.followee, follower=self.user
+        )
+        self.pre_count = FriendShip.objects.count()
+
     def test_success_post(self):
-        pass
+        response = self.client.post(
+            reverse("accounts:unfollow", kwargs={"username": self.followee.username})
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "welcome:home",
+            ),
+            302,
+            200,
+        )
+        self.assertEqual(FriendShip.objects.count(), self.pre_count - 1)
 
     def test_failure_post_with_not_exist_tweet(self):
-        pass
+        response = self.client.post(
+            reverse("accounts:unfollow", kwargs={"username": "unexist_user"})
+        )
+        self.assertEqual(response.status_code, 404)
+        expected_err = b"The requested resource was not found on this server."
+        self.assertIn(expected_err, response.content)
+        post_count = FriendShip.objects.count()
+        self.assertEqual(self.pre_count, post_count)
 
     def test_failure_post_with_incorrect_user(self):
-        pass
+        response = self.client.post(
+            reverse("accounts:unfollow", kwargs={"username": self.user.username})
+        )
+        self.assertEqual(response.status_code, 200)
+        expected_err = b"You can't follow yourself."
+        self.assertIn(expected_err, response.content)
 
 
 class TestFollowingListView(TestCase):
