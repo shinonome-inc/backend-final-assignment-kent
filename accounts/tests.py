@@ -1,10 +1,12 @@
 from django.conf import settings
-from django.contrib.auth import SESSION_KEY
+from django.contrib.auth import SESSION_KEY, get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
 from accounts.forms import UserSignInForm
-from accounts.models import User, FriendShip
+from accounts.models import FriendShip
+
+User = get_user_model()
 
 
 class TestSignUpView(TestCase):

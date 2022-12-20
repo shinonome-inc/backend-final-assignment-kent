@@ -1,13 +1,15 @@
 from django.conf import settings
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.views import LogoutView
-from django.shortcuts import redirect, render, get_object_or_404
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.generic import View
-from django.http import HttpResponse
 
 from accounts.forms import UserCreateForm, UserSignInForm
-from accounts.models import FriendShip, User
+from accounts.models import FriendShip
+
+User = get_user_model()
 
 
 class SignUpView(View):
@@ -126,7 +128,6 @@ class UnfollowView(View):
 
 class FolloweeListView(View):
     def get(self, request, *args, **kwargs):
-        # TODO: フォローしているユーザーの一覧を表示する(HTMLのパスが不正)
         return render(
             request,
             "accounts/followee_list.html",
@@ -139,7 +140,6 @@ class FolloweeListView(View):
 
 class FollowerListView(View):
     def get(self, request, *args, **kwargs):
-        # TODO: フォローされているユーザーの一覧を表示する(HTMLのパスが不正)
         return render(
             request,
             "accounts/followee_list.html",
