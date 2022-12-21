@@ -12,8 +12,10 @@
         <a href="{% url 'accounts:signout' %}"><button>SignOut</button></a>
         <a href="{% url 'tweets:create' %}"><button>Tweet</button></a>
         <a href="{% url 'tweets:home' %}"><button>ツイート一覧</button></a>
-        <a href="{% url 'accounts:following_list' user.username %}"><button>フォイーリスト</button></a>
-        <a href="{% url 'accounts:follower_list' user.username %}"><button>フォロワーリスト</button></a>
+      </div>
+      <div>
+        <a href="{% url 'accounts:following_list' user.username %}"><button>フォロイーリスト</button></a>
+        <a href="{% url 'accounts:follower_list' user.username %}"><button>フォロワーリスト</button></a>        
       </div>
     {% else %}
       現在ログインしていません
