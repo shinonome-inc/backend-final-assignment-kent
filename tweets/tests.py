@@ -15,6 +15,7 @@ class TestTweetCreateView(TestCase):
         self.user = User.objects.create_user(
             username="test", email="hoge@email.com", password="testpass0000"
         )
+        self.client.force_login(self.user)
 
     def test_success_get(self):
         response = self.client.get(self.create_url)
