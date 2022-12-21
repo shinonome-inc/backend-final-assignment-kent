@@ -17,7 +17,14 @@ class FriendShip(models.Model):
         User, related_name="followee", on_delete=models.CASCADE
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'"{self.follower.username}" follows "{self.followee.username}"'
+
+    class Meta:
+        constraints = [
+            # 同じ日に部屋の予約を重複させない
+            models.UniqueConstraint(
+                fields=["follower", "followee"], name="unique_booking"
+            ),
+        ]
