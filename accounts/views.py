@@ -67,7 +67,7 @@ class SignInView(View):
             return render(
                 request,
                 "accounts/signin.html",
-                {"context": "formが無効です", "error_occured": True},
+                {"error_occured": True},
             )
 
     def get(self, request, *args, **kwargs):
