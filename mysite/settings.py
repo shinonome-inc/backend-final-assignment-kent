@@ -130,4 +130,4 @@ AUTH_USER_MODEL = "accounts.User"
 
 LOGIN_REDIRECT_URL = "welcome:home"
 LOGOUT_REDIRECT_URL = "welcome:home"
-LOGIN_URL = "accounts:login"
+LOGIN_URL = "accounts:signin"
