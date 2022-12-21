@@ -5,9 +5,11 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.generic import View
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from accounts.forms import UserCreateForm, UserSignInForm
 from accounts.models import FriendShip
+from tweets.models import Tweet
 
 User = get_user_model()
 
@@ -59,7 +61,7 @@ class SignInView(View):
                 return render(
                     request,
                     "signin.html",
-                    {"context": "ログインに失敗しました", "error_occured": False},
+                    {"context": "ログインに失敗しました", "error_occured": True},
                 )
         else:
             return render(
@@ -74,34 +76,35 @@ class SignInView(View):
         return render(request, template_name, {"form": form})
 
 
-class SignOutView(LogoutView):
+class SignOutView(LoginRequiredMixin, LogoutView):
     pass
 
 
-class UserProfileView(View):
+class UserProfileView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         requested_user = get_object_or_404(User, username=kwargs.get("username"))
-        follower_frindship_records = FriendShip.objects.filter(followee=requested_user)
-        followee_friendship_records = FriendShip.objects.filter(follower=requested_user)
-        follower_users = [
-            follower_record.followee for follower_record in follower_frindship_records
-        ]
-        followee_users = [
-            followee_record.follower for followee_record in followee_friendship_records
-        ]
-        context = {"followers": follower_users, "followees": followee_users}
+        requested_username = requested_user.get_username()
+        user_tweets = Tweet.objects.filter(user=requested_user)
+        follower_count = FriendShip.objects.filter(followee=requested_user).count()
+        followee_count = FriendShip.objects.filter(follower=requested_user).count()
+        context = {
+            "follower_count": follower_count,
+            "followee_count": followee_count,
+            "user_tweets": user_tweets,
+            "requested_username": requested_username,
+        }
         return render(request, "accounts/userprofile.html", context)
 
 
-class UserProfileEditView(View):
-    def post(self, request, *args, **kwargs):
-        pass
+# class UserProfileEditView(View):
+#    def post(self, request, *args, **kwargs):
+#        pass
+#
+#    def get(self, request, *args, **kwargs):
+#        pass
 
-    def get(self, request, *args, **kwargs):
-        pass
 
-
-class FollowView(View):
+class FollowView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         followee_record = get_object_or_404(User, username=kwargs.get("username"))
         follower_record = request.user
@@ -112,7 +115,7 @@ class FollowView(View):
         return redirect(reverse("welcome:home"))
 
 
-class UnfollowView(View):
+class UnfollowView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         followee_record = get_object_or_404(User, username=kwargs.get("username"))
         follower_record = request.user
@@ -126,25 +129,27 @@ class UnfollowView(View):
         return redirect(reverse("welcome:home"))
 
 
-class FolloweeListView(View):
+class FollowerListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
+        frienships = FriendShip.objects.filter(followee=request.user)
+        followers = [friendship.follower for friendship in frienships]
         return render(
             request,
             "accounts/followee_list.html",
             {
-                "user": request.user,
-                "friendships": FriendShip.objects.filter(follower=request.user).all(),
+                "followers": followers,
             },
         )
 
 
-class FollowerListView(View):
+class FolloweeListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
+        friendships = FriendShip.objects.filter(follower=request.user)
+        followees = [friendship.follower for friendship in friendships]
         return render(
             request,
             "accounts/followee_list.html",
             {
-                "user": request.user,
-                "friendships": FriendShip.objects.filter(followee=request.user).all(),
+                "followees": followees,
             },
         )
