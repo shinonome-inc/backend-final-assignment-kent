@@ -8,11 +8,11 @@ urlpatterns = [
     path("signin", views.SignInView.as_view(), name="signin"),
     path("signout", views.SignOutView.as_view(), name="signout"),
     path("<str:username>/profile/", views.UserProfileView.as_view(), name="profile"),
-    path(
-        "<str:username>/profile/edit/",
-        views.UserProfileEditView.as_view(),
-        name="profile_edit",
-    ),
+    # path(
+    #    "<str:username>/profile/edit/",
+    #    views.UserProfileEditView.as_view(),
+    #    name="profile_edit",
+    # ),
     path(
         "<str:username>/following_list/",
         views.FolloweeListView.as_view(),
