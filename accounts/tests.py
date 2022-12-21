@@ -261,18 +261,24 @@ class TestLogoutView(TestCase):
         self.assertNotIn(SESSION_KEY, self.client.session)
 
 
-# class TestUserProfileView(TestCase):
-#    def setUp(self) -> None:
-#        self.user = User.objects.create_user(
-#            username="test", password="testpasscd", email="hoge@email.com"
-#        )
-#        self.client.force_login(self.user)
-#
-#    def test_success_get(self):
-#        response = self.client.get(
-#            reverse("accounts:profile", kwargs={"username": self.user.username})
-#        )
-#        self.assertEqual(response.status_code, 200)
+class TestUserProfileView(TestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username="test", password="testpasscd", email="hoge@email.com"
+        )
+        self.client.force_login(self.user)
+
+    def test_success_get(self):
+        response = self.client.get(
+            reverse("accounts:profile", kwargs={"username": self.user.username})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_failure_get_with_not_exists_user(self):
+        response = self.client.get(
+            reverse("accounts:profile", kwargs={"username": "not_exists_user"})
+        )
+        self.assertEqual(response.status_code, 404)
 
 
 # class TestUserProfileEditView(TestCase):
