@@ -23,8 +23,7 @@ class FriendShip(models.Model):
 
     class Meta:
         constraints = [
-            # 同じ日に部屋の予約を重複させない
             models.UniqueConstraint(
-                fields=["follower", "followee"], name="unique_booking"
+                fields=["follower", "followee"], name="unique_followship"
             ),
         ]
