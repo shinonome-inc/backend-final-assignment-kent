@@ -1,10 +1,12 @@
 from django.conf import settings
-from django.contrib.auth import SESSION_KEY
+from django.contrib.auth import SESSION_KEY, get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from accounts.forms import UserCreateForm, UserSignInForm
-from accounts.models import User
+from accounts.forms import UserSignInForm
+from accounts.models import FriendShip
+
+User = get_user_model()
 
 
 class TestSignUpView(TestCase):
@@ -46,7 +48,6 @@ class TestSignUpView(TestCase):
         }
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -64,7 +65,6 @@ class TestSignUpView(TestCase):
         }
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -82,7 +82,6 @@ class TestSignUpView(TestCase):
         }
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -101,7 +100,6 @@ class TestSignUpView(TestCase):
         }
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -109,18 +107,17 @@ class TestSignUpView(TestCase):
         User.objects.create_user(
             username="test", email="fuga@email.com", password="passcode0000"
         )
-        data2 = {
+        duplicated_data = {
             "username": "test",
             "email": "fuga@email.com",
             "password1": "passcode0000",
             "password2": "passcode0000",
         }
-        response = self.client.post(self.signup_url, data2)
+        response = self.client.post(self.signup_url, duplicated_data)
         form = response.context["form"]
         expected_errs = {"username": "同じユーザー名が既に登録済みです。"}
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data2)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 1)
 
@@ -131,11 +128,11 @@ class TestSignUpView(TestCase):
             "password1": "test0000",
             "password2": "test0000",
         }
-        form = UserCreateForm(data)
+        response = self.client.post(self.signup_url, data)
+        form = response.context["form"]
         expected_errs = {"email": "有効なメールアドレスを入力してください。"}
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -151,7 +148,6 @@ class TestSignUpView(TestCase):
         expected_errs = {"password2": "このパスワードは短すぎます。最低 8 文字以上必要です。"}
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -167,7 +163,6 @@ class TestSignUpView(TestCase):
         expected_errs = {"password2": "このパスワードは ユーザー名 と似すぎています。"}
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -183,7 +178,6 @@ class TestSignUpView(TestCase):
         expected_errs = {"password2": "このパスワードは数字しか使われていません。"}
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -199,7 +193,6 @@ class TestSignUpView(TestCase):
         expected_errs = {"password2": "確認用パスワードが一致しません。"}
         for key, message in expected_errs.items():
             self.assertIn(message, form.errors[key])
-        response = self.client.post(self.signup_url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -269,51 +262,156 @@ class TestLogoutView(TestCase):
 
 
 class TestUserProfileView(TestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username="test", password="testpasscd", email="hoge@email.com"
+        )
+        self.client.force_login(self.user)
+
     def test_success_get(self):
-        pass
+        response = self.client.get(
+            reverse("accounts:profile", kwargs={"username": self.user.username})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_failure_get_with_not_exists_user(self):
+        response = self.client.get(
+            reverse("accounts:profile", kwargs={"username": "not_exists_user"})
+        )
+        self.assertEqual(response.status_code, 404)
 
 
-class TestUserProfileEditView(TestCase):
-    def test_success_get(self):
-        pass
-
-    def test_success_post(self):
-        pass
-
-    def test_failure_post_with_not_exists_user(self):
-        pass
-
-    def test_failure_post_with_incorrect_user(self):
-        pass
+# class TestUserProfileEditView(TestCase):
+#    def test_success_get(self):
+#        pass
+#
+#    def test_success_post(self):
+#        pass
+#
+#    def test_failure_post_with_not_exists_user(self):
+#        pass
+#
+#    def test_failure_post_with_incorrect_user(self):
+#        pass
 
 
 class TestFollowView(TestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username="follower_user", password="testpasscd", email="hoge@email.com"
+        )
+        self.client.force_login(self.user)
+        self.followee = User.objects.create_user(
+            username="followee_user", password="testpasscd", email="hoge@email.com"
+        )
+        self.pre_count = FriendShip.objects.count()
+
     def test_success_post(self):
-        pass
+        response = self.client.post(
+            reverse("accounts:follow", kwargs={"username": self.followee.username})
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "welcome:home",
+            ),
+            302,
+            200,
+        )
+        added_record = FriendShip.objects.get(
+            followee=self.followee, follower=self.user
+        )
+        self.assertIsNotNone(added_record)
 
     def test_failure_post_with_not_exist_user(self):
-        pass
+        response = self.client.post(
+            reverse("accounts:follow", kwargs={"username": "unexist_user"})
+        )
+        self.assertEqual(response.status_code, 404)
+        expected_err = b"The requested resource was not found on this server."
+        self.assertIn(expected_err, response.content)
+        post_count = FriendShip.objects.count()
+        self.assertEqual(self.pre_count, post_count)
 
     def test_failure_post_with_self(self):
-        pass
+        response = self.client.post(
+            reverse("accounts:follow", kwargs={"username": self.user.username})
+        )
+        self.assertEqual(response.status_code, 200)
+        expected_err = b"You can't follow yourself."
+        self.assertIn(expected_err, response.content)
 
 
 class TestUnfollowView(TestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username="user", password="testpasscd", email="hoge@email.com"
+        )
+        self.client.force_login(self.user)
+        self.followee = User.objects.create_user(
+            username="followee_user", password="testpasscd", email="hoge@email.com"
+        )
+        self.target_frienship = FriendShip.objects.create(
+            followee=self.followee, follower=self.user
+        )
+        self.pre_count = FriendShip.objects.count()
+
     def test_success_post(self):
-        pass
+        response = self.client.post(
+            reverse("accounts:unfollow", kwargs={"username": self.followee.username})
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "welcome:home",
+            ),
+            302,
+            200,
+        )
+        self.assertEqual(FriendShip.objects.count(), self.pre_count - 1)
 
     def test_failure_post_with_not_exist_tweet(self):
-        pass
+        response = self.client.post(
+            reverse("accounts:unfollow", kwargs={"username": "unexist_user"})
+        )
+        self.assertEqual(response.status_code, 404)
+        expected_err = b"The requested resource was not found on this server."
+        self.assertIn(expected_err, response.content)
+        post_count = FriendShip.objects.count()
+        self.assertEqual(self.pre_count, post_count)
 
     def test_failure_post_with_incorrect_user(self):
-        pass
+        response = self.client.post(
+            reverse("accounts:unfollow", kwargs={"username": self.user.username})
+        )
+        self.assertEqual(response.status_code, 200)
+        expected_err = b"You can't follow yourself."
+        self.assertIn(expected_err, response.content)
 
 
 class TestFollowingListView(TestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username="follower_user", password="testpasscd", email="hoge@email.com"
+        )
+        self.client.force_login(self.user)
+
     def test_success_get(self):
-        pass
+        response = self.client.get(
+            reverse("accounts:following_list", kwargs={"username": self.user.username})
+        )
+        self.assertEqual(response.status_code, 200)
 
 
 class TestFollowerListView(TestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username="follower_user", password="testpasscd", email="hoge@email.com"
+        )
+        self.client.force_login(self.user)
+
     def test_success_get(self):
-        pass
+        response = self.client.get(
+            reverse("accounts:follower_list", kwargs={"username": self.user.username})
+        )
+        self.assertEqual(response.status_code, 200)

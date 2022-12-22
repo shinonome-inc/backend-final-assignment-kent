@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title%} フォロイー一覧 {%endblock%}
+
+{% block body %}
+    <h1>フォロイー一覧</h1>
+    <table border="1">
+        <tr>
+            <td>フォロワー</td>
+        </tr>
+        {% for followee in followees %}
+            <tr>
+                <td>{{ followee.username }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
