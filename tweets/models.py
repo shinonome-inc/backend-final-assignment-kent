@@ -14,3 +14,15 @@ class Tweet(models.Model):
 
     class Meta:
         verbose_name_plural = "ツイート"
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="favoriting_user"
+    )
+    tweet = models.ForeignKey(
+        Tweet, on_delete=models.CASCADE, related_name="favorited_tweet"
+    )
+
+    def __str__(self):
+        return f"{self.user.username} likes Tweet by IDed {str(Tweet.pk)}"
