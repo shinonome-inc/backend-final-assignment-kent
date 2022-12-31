@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from tweets.models import Tweet
+from tweets.models import Favorite, Tweet
 
 User = get_user_model()
 
@@ -112,17 +112,42 @@ class TestTweetDeleteView(TestCase):
 
 
 class TestFavoriteView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="test_user", email="hoge@email.com", password="testpass0000"
+        )
+        self.client.force_login(user=self.user)
+        self.tweet = Tweet.objects.create(content="test_tweet", user=self.user)
+        self.tweet_id = self.tweet.pk
+
     def test_success_post(self):
-        pass
+        response = self.client.post(
+            reverse("tweets:favorite", kwargs={"pk": self.tweet_id})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Favorite.objects.count(), 1)
 
     def test_failure_post_with_not_exist_tweet(self):
-        pass
+        response = self.client.post(
+            reverse("tweets:favorite", kwargs={"pk": self.tweet_id + 1})
+        )
+        self.assertEqual(response.status_code, 404)
+        print(response.context)
+        self.assertEqual(Favorite.objects.count(), 0)
 
     def test_failure_post_with_favorited_tweet(self):
         pass
 
 
 class TestUnfavoriteView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="test_user", email="hoge@email.com", password="testpass0000"
+        )
+        self.client.force_login(user=self.user)
+        self.tweet = Tweet.objects.create(content="test_tweet", user=self.user)
+        self.tweet_id = self.tweet.pk
+
     def test_success_post(self):
         pass
 
