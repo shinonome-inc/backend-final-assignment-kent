@@ -1,10 +1,10 @@
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from tweets.forms import TweetCreateForm
-from tweets.models import Tweet
+from tweets.models import Tweet, Favorite
 
 
 class TweetHomeView(LoginRequiredMixin, View):
@@ -49,3 +49,27 @@ class TweetDeleteView(LoginRequiredMixin, View):
             return HttpResponseForbidden()
         tweet.delete()
         return redirect("welcome:home")
+
+
+class LikeView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        tweet = get_object_or_404(
+            Tweet,
+            pk=kwargs.get("pk"),
+        )
+        if Favorite.objects.filter(user=request.user, tweet=tweet).exists():
+            return HttpResponse("Already liked", status=200)
+        Favorite.objects.create(user=request.user, tweet=tweet)
+        return HttpResponse("OK", status=200)
+
+
+class UnlikeView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        tweet = get_object_or_404(
+            Tweet,
+            pk=kwargs.get("pk"),
+        )
+        if not Favorite.objects.filter(user=request.user, tweet=tweet).exists():
+            return HttpResponse("Already liked", status=200)
+        Favorite.objects.delete(user=request.user, tweet=tweet)
+        return HttpResponse("OK", status=200)
