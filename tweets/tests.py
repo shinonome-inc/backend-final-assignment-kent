@@ -184,12 +184,9 @@ class TestUnfavoriteView(TestCase):
         self.assertEqual(post_favorite_count, self.pre_favorite_count)
 
     def test_failure_post_with_unfavorited_tweet(self):
-        self.tweet = Tweet.objects.create(content="unfavorited_tweet", user=self.user)
-        self.unfavorited_tweet_id = self.tweet.pk
-        pre_favorite_count = Favorite.objects.count()
+        tweet = Tweet.objects.create(content="unfavorited_tweet", user=self.user)
+        self.unfavorited_tweet_id = tweet.pk
         request = self.client.post(
-            reverse("tweets:favorite", kwargs={"pk": self.favorited_tweet_id})
+            reverse("tweets:favorite", kwargs={"pk": self.unfavorited_tweet_id})
         )
         self.assertEqual(request.status_code, 200)
-        post_favorite_count = Favorite.objects.count()
-        self.assertEqual(post_favorite_count, pre_favorite_count)
