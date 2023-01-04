@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from tweets.models import Tweet
+from tweets.models import Tweet, Favorite
 
 User = get_user_model()
 
@@ -112,22 +112,84 @@ class TestTweetDeleteView(TestCase):
 
 
 class TestFavoriteView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="test_user", email="hoge@email.com", password="testpass0000"
+        )
+        self.client.force_login(user=self.user)
+        self.tweet = Tweet.objects.create(content="test_tweet", user=self.user)
+        self.tweet_id = self.tweet.pk
+        self.pre_favorite_count = Favorite.objects.count()
+
     def test_success_post(self):
-        pass
+        request = self.client.post(
+            reverse("tweets:favorite", kwargs={"pk": self.tweet_id})
+        )
+        self.assertEqual(request.status_code, 200)
+        post_favorite_count = Favorite.objects.count()
+        self.assertEqual(post_favorite_count, self.pre_favorite_count + 1)
 
     def test_failure_post_with_not_exist_tweet(self):
-        pass
+        unexist_tweet_id = self.tweet_id + 1
+        request = self.client.post(
+            reverse("tweets:favorite", kwargs={"pk": unexist_tweet_id})
+        )
+        err_mes = b"The requested resource was not found on this server."
+        self.assertIn(err_mes, request.content)
+        self.assertEqual(request.status_code, 404)
+        post_favorite_count = Favorite.objects.count()
+        self.assertEqual(post_favorite_count, self.pre_favorite_count)
 
     def test_failure_post_with_favorited_tweet(self):
-        pass
+        self.tweet = Tweet.objects.create(content="favorited_tweet", user=self.user)
+        self.favorited_tweet_id = self.tweet.pk
+        Favorite.objects.create(user=self.user, tweet=self.tweet)
+        pre_favorite_count = Favorite.objects.count()
+        request = self.client.post(
+            reverse("tweets:favorite", kwargs={"pk": self.favorited_tweet_id})
+        )
+        self.assertEqual(request.status_code, 200)
+        post_favorite_count = Favorite.objects.count()
+        self.assertEqual(post_favorite_count, pre_favorite_count)
 
 
 class TestUnfavoriteView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="test_user", email="hoge@email.com", password="testpass0000"
+        )
+        self.client.force_login(user=self.user)
+        self.tweet = Tweet.objects.create(content="test_tweet", user=self.user)
+        self.tweet_id = self.tweet.pk
+        Favorite.objects.create(user=self.user, tweet=self.tweet)
+        self.pre_favorite_count = Favorite.objects.count()
+
     def test_success_post(self):
-        pass
+        request = self.client.post(
+            reverse("tweets:unfavorite", kwargs={"pk": self.tweet_id})
+        )
+        self.assertEqual(request.status_code, 200)
+        post_favorite_count = Favorite.objects.count()
+        self.assertEqual(post_favorite_count, self.pre_favorite_count - 1)
 
     def test_failure_post_with_not_exist_tweet(self):
-        pass
+        unexist_tweet_id = self.tweet_id + 1
+        request = self.client.post(
+            reverse("tweets:favorite", kwargs={"pk": unexist_tweet_id})
+        )
+        err_mes = b"The requested resource was not found on this server."
+        self.assertIn(err_mes, request.content)
+        self.assertEqual(request.status_code, 404)
+        post_favorite_count = Favorite.objects.count()
+        self.assertEqual(post_favorite_count, self.pre_favorite_count)
 
     def test_failure_post_with_unfavorited_tweet(self):
-        pass
+        self.tweet = Tweet.objects.create(content="unfavorited_tweet", user=self.user)
+        self.unfavorited_tweet_id = self.tweet.pk
+        pre_favorite_count = Favorite.objects.count()
+        request = self.client.post(
+            reverse("tweets:favorite", kwargs={"pk": self.favorited_tweet_id})
+        )
+        self.assertEqual(request.status_code, 200)
+        post_favorite_count = Favorite.objects.count()
+        self.assertEqual(post_favorite_count, pre_favorite_count)
