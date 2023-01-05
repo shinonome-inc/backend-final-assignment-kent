@@ -30,7 +30,7 @@
         </tr>
     {% endfor %}
 </table>
-
+<h3>フォロワー・フォロイー</h3>
 <table border="1">
     <tr>
         <td>フォロワー数</td>
@@ -47,5 +47,24 @@
         </td>
     </tr>
 </table>
-
+<h3>いいねしたツイート</h3>
+<table border="1">
+    <tr>
+        <th>いいねしたツイート</th>
+        <th>いいね取消</th>
+    </tr>
+    {% for favorited_tweet in favorited_tweets %}
+        <tr>
+            <td>
+                {{ favorited_tweet.content }}
+            </td>
+            <td>
+                <form action="{% url 'tweets:unfavorite' favorited_tweet.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit">いいね取消</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
 {% endblock %}

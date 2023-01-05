@@ -10,12 +10,14 @@
                 <th>内容</th>
                 <th>作成日</th>
                 <th>削除</th>
+                <th>いいね数</th>
             </tr>
             <tr>
                 <td>{{tweet.pk}}</td>
                 <td>{{tweet.content}}</td>
                 <td>{{tweet.created_at}}</td>
                 <td><a href={% url 'tweets:delete' tweet.pk %}>削除</a></td>
+                <td>{{ favorite_count }}</td>
             </tr>
         </table>
     </div>

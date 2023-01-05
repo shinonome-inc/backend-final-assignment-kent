@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 
 {% block title %}
-  WELCOME
+HOME
 {% endblock title %}
+
 {% block body %}
   <h1>Backend Final Assignment</h1>
   <h2>
@@ -21,6 +22,8 @@
             <th>内容</th>
             <th>作成日</th>
             <th>ユーザー</th>
+            <th>いいね</th>
+            <th>いいね取消</th>
             <th>削除</th>
         </tr>
         {% for tweet in tweets %}
@@ -29,6 +32,22 @@
             <td><a href={% url 'tweets:detail' tweet.pk %}>{{ tweet.content }}</a></td>
             <td>{{ tweet.created_at }}</td>
             <td>{{ tweet.user }}</td>
+            <td>
+              {% if tweet not in favorited_tweets %}
+                <form action="{% url 'tweets:favorite' tweet.id %}" method="POST">
+                  {% csrf_token %}
+                  <button type="submit">いいね</button>
+                </form>
+              {%endif%}
+            </td>
+            <td>
+              {% if tweet in favorited_tweets %}
+                <form action="{% url 'tweets:unfavorite' tweet.id %}" method="POST">
+                  {% csrf_token %}
+                  <button type="submit">いいね取消</button>
+                </form>
+              {% endif %}
+            </td>
             <td>
               {% if tweet.user == request.user %}
                 <form action="{% url 'tweets:delete' tweet.id %}" method="POST">
@@ -41,7 +60,6 @@
         {% endfor %}
       </table>
     </div>
-    
     {% else %}
     現在ログインしていません
     <div>
