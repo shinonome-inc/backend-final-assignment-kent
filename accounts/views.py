@@ -1,15 +1,14 @@
-from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login
-from django.contrib.auth.views import LogoutView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.generic import View
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 from accounts.forms import UserCreateForm, UserSignInForm
 from accounts.models import FriendShip
-from tweets.models import Tweet
+from tweets.models import Tweet, Favorite
 
 User = get_user_model()
 
@@ -44,36 +43,9 @@ class SignUpView(View):
         )
 
 
-class SignInView(View):
-    def post(self, request, *args, **kwargs):
-        form = UserSignInForm(data=request.POST)
-        if form.is_valid():
-            # フォームから'username'を読み取る
-            username = form.cleaned_data.get("username")
-            # フォームから'password'を読み取る
-            password = form.cleaned_data.get("password")
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                # 認証処理
-                login(request, user)
-                return redirect(settings.LOGIN_REDIRECT_URL)
-            else:
-                return render(
-                    request,
-                    "signin.html",
-                    {"context": "ログインに失敗しました", "error_occured": True},
-                )
-        else:
-            return render(
-                request,
-                "accounts/signin.html",
-                {"error_occured": True},
-            )
-
-    def get(self, request, *args, **kwargs):
-        template_name = "accounts/signin.html"
-        form = UserSignInForm()
-        return render(request, template_name, {"form": form})
+class SignInView(LoginView):
+    form_class = UserSignInForm
+    template_name = "accounts/signin.html"
 
 
 class SignOutView(LoginRequiredMixin, LogoutView):
@@ -87,11 +59,16 @@ class UserProfileView(LoginRequiredMixin, View):
         user_tweets = Tweet.objects.filter(user=requested_user)
         follower_count = FriendShip.objects.filter(followee=requested_user).count()
         followee_count = FriendShip.objects.filter(follower=requested_user).count()
+        favorited_tweets = [
+            favorite_records.tweet
+            for favorite_records in Favorite.objects.filter(user=requested_user)
+        ]
         context = {
             "follower_count": follower_count,
             "followee_count": followee_count,
             "user_tweets": user_tweets,
             "requested_username": requested_username,
+            "favorited_tweets": favorited_tweets,
         }
         return render(request, "accounts/userprofile.html", context)
 
