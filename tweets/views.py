@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseForbidden, HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
 
@@ -10,7 +10,14 @@ from tweets.models import Favorite, Tweet
 class TweetHomeView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         tweets = Tweet.objects.select_related("user").all()
-        context = {"tweets": tweets}
+        favorited_tweets = [
+            favorite_record.tweet
+            for favorite_record in Favorite.objects.filter(user=request.user)
+        ]
+        context = {
+            "tweets": tweets,
+            "favorited_tweets": favorited_tweets,
+        }
         return render(request, "tweets/tweets_home.html", context)
 
 
@@ -34,9 +41,18 @@ class TweetDetailView(LoginRequiredMixin, View):
             Tweet,
             pk=kwargs.get("pk"),
         )
+        favorite_count = Favorite.objects.filter(tweet=tweet).count()
         if tweet.user != request.user:
             return HttpResponseForbidden()
-        return render(request, "tweets/tweets_detail.html", {"tweet": tweet})
+        context = {
+            "tweet": tweet,
+            "favorite_count": favorite_count,
+        }
+        return render(
+            request,
+            "tweets/tweets_detail.html",
+            context,
+        )
 
 
 class TweetDeleteView(LoginRequiredMixin, View):
@@ -69,6 +85,8 @@ class UnfavoriteView(LoginRequiredMixin, View):
             Tweet,
             pk=kwargs.get("pk"),
         )
+        if Favorite.objects.filter(user=request.user, tweet=tweet).count() == 0:
+            return HttpResponse("Favorite Record Unexist", status=200)
         favorite_record = Favorite.objects.get(user=request.user, tweet=tweet)
         favorite_record.delete()
         return HttpResponse("OK", status=200)
