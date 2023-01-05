@@ -1,10 +1,6 @@
 from django.contrib import admin
 
-from .models import Tweet
+from .models import Favorite, Tweet
 
-
-class TweetAdmin(admin.ModelAdmin):
-    pass
-
-
-admin.site.register(Tweet, TweetAdmin)
+admin.site.register(Tweet)
+admin.site.register(Favorite)
