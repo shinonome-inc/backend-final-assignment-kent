@@ -134,8 +134,8 @@ class TestFavoriteView(TestCase):
         request = self.client.post(
             reverse("tweets:favorite", kwargs={"pk": unexist_tweet_id})
         )
-        err_mes = b"The requested resource was not found on this server."
-        self.assertIn(err_mes, request.content)
+        err_msg = b"The requested resource was not found on this server."
+        self.assertIn(err_msg, request.content)
         self.assertEqual(request.status_code, 404)
         post_favorite_count = Favorite.objects.count()
         self.assertEqual(post_favorite_count, self.pre_favorite_count)
@@ -177,8 +177,8 @@ class TestUnfavoriteView(TestCase):
         request = self.client.post(
             reverse("tweets:favorite", kwargs={"pk": unexist_tweet_id})
         )
-        err_mes = b"The requested resource was not found on this server."
-        self.assertIn(err_mes, request.content)
+        err_msg = b"The requested resource was not found on this server."
+        self.assertIn(err_msg, request.content)
         self.assertEqual(request.status_code, 404)
         post_favorite_count = Favorite.objects.count()
         self.assertEqual(post_favorite_count, self.pre_favorite_count)

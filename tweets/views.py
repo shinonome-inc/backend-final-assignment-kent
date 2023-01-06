@@ -73,7 +73,7 @@ class FavoriteView(LoginRequiredMixin, View):
             Tweet,
             pk=kwargs.get("pk"),
         )
-        if Favorite.objects.filter(user=request.user, tweet=tweet).count() != 0:
+        if Favorite.objects.filter(user=request.user, tweet=tweet).exists():
             return HttpResponse("UNIQUE constraint failed", status=200)
         Favorite.objects.create(user=request.user, tweet=tweet)
         return HttpResponse("OK", status=200)

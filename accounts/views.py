@@ -8,7 +8,7 @@ from django.views.generic import View
 
 from accounts.forms import UserCreateForm, UserSignInForm
 from accounts.models import FriendShip
-from tweets.models import Tweet, Favorite
+from tweets.models import Favorite, Tweet
 
 User = get_user_model()
 
@@ -108,11 +108,11 @@ class UnfollowView(LoginRequiredMixin, View):
 
 class FollowerListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        frienships = FriendShip.objects.filter(followee=request.user)
-        followers = [friendship.follower for friendship in frienships]
+        frienships = FriendShip.objects.filter(follower=request.user)
+        followers = [friendship.followee for friendship in frienships]
         return render(
             request,
-            "accounts/followee_list.html",
+            "accounts/follower_list.html",
             {
                 "followers": followers,
             },
@@ -121,7 +121,7 @@ class FollowerListView(LoginRequiredMixin, View):
 
 class FolloweeListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        friendships = FriendShip.objects.filter(follower=request.user)
+        friendships = FriendShip.objects.filter(followee=request.user)
         followees = [friendship.follower for friendship in friendships]
         return render(
             request,
