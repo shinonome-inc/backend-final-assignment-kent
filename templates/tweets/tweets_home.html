@@ -34,18 +34,12 @@ HOME
             <td>{{ tweet.user }}</td>
             <td>
               {% if tweet not in favorited_tweets %}
-                <form action="{% url 'tweets:favorite' tweet.id %}" method="POST">
-                  {% csrf_token %}
-                  <button type="submit">いいね</button>
-                </form>
+                <button onclick="set_favorite_tweet({% url 'tweets:favorite' tweet.id %})">いいね</button>
               {%endif%}
             </td>
             <td>
               {% if tweet in favorited_tweets %}
-                <form action="{% url 'tweets:unfavorite' tweet.id %}" method="POST">
-                  {% csrf_token %}
-                  <button type="submit">いいね取消</button>
-                </form>
+                <button onclick="set_favorite_tweet({% url 'tweets:unfavorite' tweet.id %})">いいね取消</button>
               {% endif %}
             </td>
             <td>
@@ -68,4 +62,5 @@ HOME
     </div>
     {% endif %}
   </h2>
+  <script src="set_or_unset_favorite.js"></script>
 {% endblock body %}
