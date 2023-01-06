@@ -6,11 +6,18 @@
     <h1>フォロワー一覧</h1>
     <table border="1">
         <tr>
-            <td>フォロワー</td>
+            <th>フォロワー</th>
+            <th>フォロー解除</th>
         </tr>
         {% for follower in followers %}
             <tr>
                 <td>{{ follower.username }}</td>
+                <td>
+                    <form method="POST" action="{% url 'accounts:unfollow' follower.username %}">
+                        {% csrf_token %}
+                        <button type="submit" name="unfollow">フォロー解除</button>
+                    </form>
+                </td>
             </tr>
         {% endfor %}
     </table>
