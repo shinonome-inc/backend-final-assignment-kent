@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
 HOME
@@ -62,5 +63,5 @@ HOME
     </div>
     {% endif %}
   </h2>
-  <script src="set_or_unset_favorite.js"></script>
+  <script src="{% static 'set_or_unset_favorite.js' %}"></script>
 {% endblock body %}
