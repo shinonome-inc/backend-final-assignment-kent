@@ -35,12 +35,12 @@ HOME
             <td>{{ tweet.user }}</td>
             <td>
               {% if tweet not in favorited_tweets %}
-                <button onclick="set_favorite_tweet({% url 'tweets:favorite' tweet.id %})">いいね</button>
+                <input type="button" value="いいね" onclick="set_or_unset_favorite_tweet('{% url 'tweets:favorite' tweet.id %}')">
               {%endif%}
             </td>
             <td>
               {% if tweet in favorited_tweets %}
-                <button onclick="set_favorite_tweet({% url 'tweets:unfavorite' tweet.id %})">いいね取消</button>
+                <input type="button" value="いいね取消" onclick="set_or_unset_favorite_tweet('{% url 'tweets:unfavorite' tweet.id %}')">
               {% endif %}
             </td>
             <td>
@@ -63,5 +63,5 @@ HOME
     </div>
     {% endif %}
   </h2>
-  <script src="{% static 'set_or_unset_favorite.js' %}"></script>
+  <script src="{% static 'js/set_or_unset_favorite.js' %}"></script>
 {% endblock body %}
