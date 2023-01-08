@@ -1,10 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
 
 from tweets.forms import TweetCreateForm
 from tweets.models import Favorite, Tweet
+import json
 
 
 class TweetHomeView(LoginRequiredMixin, View):
@@ -76,7 +77,10 @@ class FavoriteView(LoginRequiredMixin, View):
         if Favorite.objects.filter(user=request.user, tweet=tweet).exists():
             return HttpResponse("UNIQUE constraint failed", status=200)
         Favorite.objects.create(user=request.user, tweet=tweet)
-        return HttpResponse("OK", status=200)
+        params = {"tweet": tweet}
+        # json形式の文字列を生成
+        json_str = json.dumps(params, ensure_ascii=False, indent=2)
+        return JsonResponse(json_str)
 
 
 class UnfavoriteView(LoginRequiredMixin, View):
@@ -85,8 +89,10 @@ class UnfavoriteView(LoginRequiredMixin, View):
             Tweet,
             pk=kwargs.get("pk"),
         )
-        if Favorite.objects.filter(user=request.user, tweet=tweet).count() == 0:
+        if Favorite.objects.filter(user=request.user, tweet=tweet).exists() is False:
             return HttpResponse("Favorite Record Unexist", status=200)
         favorite_record = Favorite.objects.get(user=request.user, tweet=tweet)
         favorite_record.delete()
-        return HttpResponse("OK", status=200)
+        params = {"tweet": tweet}
+        json_str = json.dumps(params, ensure_ascii=False, indent=2)
+        return JsonResponse(json_str, status=200)
