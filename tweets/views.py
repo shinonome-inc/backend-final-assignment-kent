@@ -92,9 +92,10 @@ class UnfavoriteView(LoginRequiredMixin, View):
             Tweet,
             pk=kwargs.get("pk"),
         )
-        if Favorite.objects.filter(user=request.user, tweet=tweet).exists() is False:
+        if not (
+            favorite_record := Favorite.objects.filter(user=request.user, tweet=tweet)
+        ):
             return HttpResponse("Favorite Record Unexist", status=200)
-        favorite_record = Favorite.objects.get(user=request.user, tweet=tweet)
         favorite_record.delete()
         params = {"tweet": tweet}
         json_str = json.dumps(params, ensure_ascii=False, indent=2)
