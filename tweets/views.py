@@ -38,16 +38,18 @@ class TweetCreateView(LoginRequiredMixin, View):
 
 class TweetDetailView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
+        is_tweet_user = None
         tweet = get_object_or_404(
             Tweet,
             pk=kwargs.get("pk"),
         )
         favorite_count = Favorite.objects.filter(tweet=tweet).count()
         if tweet.user != request.user:
-            return HttpResponseForbidden()
+            is_tweet_user = False
         context = {
             "tweet": tweet,
             "favorite_count": favorite_count,
+            "is_tweet_user": is_tweet_user,
         }
         return render(
             request,
