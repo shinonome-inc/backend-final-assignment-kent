@@ -37,14 +37,12 @@ class TweetCreateView(LoginRequiredMixin, View):
 
 class TweetDetailView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        is_tweet_user = None
         tweet = get_object_or_404(
             Tweet,
             pk=kwargs.get("pk"),
         )
+        is_tweet_user = tweet.user == request.user
         favorite_count = Favorite.objects.filter(tweet=tweet).count()
-        if tweet.user != request.user:
-            is_tweet_user = False
         context = {
             "tweet": tweet,
             "favorite_count": favorite_count,
@@ -93,5 +91,5 @@ class UnfavoriteView(LoginRequiredMixin, View):
         ):
             return HttpResponse("Favorite Record Unexist", status=200)
         favorite_record.delete()
-        params = {"tweet": tweet.id}
+        params = {"data": tweet.id}
         return JsonResponse(params, status=200)

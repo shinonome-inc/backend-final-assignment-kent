@@ -14,6 +14,17 @@ function getCookie(name) {
     return cookieValue;
 }
 
+function set_favorite_button_space_inner_html(tweet_url) {
+    let button_elem = document.getElementById("favorite_unfavorite_button");
+    button_elem.innerHTML = get_favorite_button_space_html(tweet_url);
+}
+
+function get_favorite_button_space_html(tweet_url) {
+    const button_msg = tweet_url.includes("unfavorite") ? "いいね" : "いいね取消";
+    const html = `<input type=\"button\" value=\"${button_msg}\" onclick=\"set_or_unset_favorite_tweet('{% url 'tweets: favorite' tweet.id %}')\">`;
+    return html;
+}
+
 function set_or_unset_favorite_tweet(tweet_url) {
     const csrftoken = getCookie('csrftoken');
     const request_options = {
@@ -22,7 +33,6 @@ function set_or_unset_favorite_tweet(tweet_url) {
             'X-CSRFToken': csrftoken
         }
     };
-    const request = new Request(tweet_url, request_options);
     // Fetch APIの実行
     fetch(tweet_url, {
         method: 'POST',
@@ -35,8 +45,8 @@ function set_or_unset_favorite_tweet(tweet_url) {
             console.log(response);
         })
         .then((json) => {
-            window.location.reload();
             console.log(`done successfully! at url: ${tweet_url}`);
+            set_favorite_button_space_inner_html(tweet_url);
             console.log(json);
         })
         // 通信が失敗したとき

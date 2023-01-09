@@ -23,8 +23,7 @@ HOME
             <th>内容</th>
             <th>作成日</th>
             <th>ユーザー</th>
-            <th>いいね</th>
-            <th>いいね取消</th>
+            <th>いいね・いいね取消</th>
             <th>削除</th>
         </tr>
         {% for tweet in tweets %}
@@ -34,14 +33,14 @@ HOME
             <td>{{ tweet.created_at }}</td>
             <td>{{ tweet.user }}</td>
             <td>
-              {% if tweet not in favorited_tweets %}
-                <input type="button" value="いいね" onclick="set_or_unset_favorite_tweet('{% url 'tweets:favorite' tweet.id %}')">
-              {%endif%}
-            </td>
-            <td>
-              {% if tweet in favorited_tweets %}
-                <input type="button" value="いいね取消" onclick="set_or_unset_favorite_tweet('{% url 'tweets:unfavorite' tweet.id %}')">
-              {% endif %}
+              <span id="favorite_unfavorite_button">
+                {% if tweet not in favorited_tweets %}
+                  <input type="button" value="いいね" onclick="set_or_unset_favorite_tweet('{% url 'tweets:favorite' tweet.id %}')">
+                {% else %}
+                  <input type="button" value="いいね取消" onclick="set_or_unset_favorite_tweet('{% url 'tweets:unfavorite' tweet.id %}')">
+                {% endif %}
+              </span>
+
             </td>
             <td>
               {% if tweet.user == request.user %}
