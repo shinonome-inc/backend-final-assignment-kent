@@ -1,5 +1,3 @@
-import json
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -80,10 +78,8 @@ class FavoriteView(LoginRequiredMixin, View):
         if Favorite.objects.filter(user=request.user, tweet=tweet).exists():
             return HttpResponse("UNIQUE constraint failed", status=200)
         Favorite.objects.create(user=request.user, tweet=tweet)
-        params = {"tweet": tweet}
-        # json形式の文字列を生成
-        json_str = json.dumps(params, ensure_ascii=False, indent=2)
-        return JsonResponse(json_str)
+        params = {"tweet": tweet.id}
+        return JsonResponse(params, status=200)
 
 
 class UnfavoriteView(LoginRequiredMixin, View):
@@ -97,6 +93,5 @@ class UnfavoriteView(LoginRequiredMixin, View):
         ):
             return HttpResponse("Favorite Record Unexist", status=200)
         favorite_record.delete()
-        params = {"tweet": tweet}
-        json_str = json.dumps(params, ensure_ascii=False, indent=2)
-        return JsonResponse(json_str, status=200)
+        params = {"tweet": tweet.id}
+        return JsonResponse(params, status=200)
