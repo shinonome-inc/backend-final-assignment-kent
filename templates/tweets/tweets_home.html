@@ -40,7 +40,6 @@ HOME
                   <input type="button" value="いいね取消" onclick="set_or_unset_favorite_tweet('{% url 'tweets:unfavorite' tweet.id %}')">
                 {% endif %}
               </span>
-
             </td>
             <td>
               {% if tweet.user == request.user %}
