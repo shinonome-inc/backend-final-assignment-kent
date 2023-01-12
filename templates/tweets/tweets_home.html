@@ -7,9 +7,10 @@ HOME
 
 {% block body %}
   <h1>Backend Final Assignment</h1>
-  <h2>
     {% if request.user.is_authenticated %}
-    {{ request.user.username }}
+    <h2>
+      {{ request.user.username }}
+    </h2>
     <div>
       <a href="{% url 'accounts:signout' %}"><button>SignOut</button></a>
     </div>
@@ -23,23 +24,26 @@ HOME
             <th>内容</th>
             <th>作成日</th>
             <th>ユーザー</th>
-            <th>いいね・いいね取消</th>
+            <th>いいね</th>
+            <th>いいね取消</th>
             <th>削除</th>
         </tr>
         {% for tweet in tweets %}
           <tr>
+            {% if tweet in favorited_tweets %}
+              <span class="event_launcher" onload="set_favorite_button_space_inner_html({{ tweet.id }},true)" style="display:none;"></span>
+            {% else %}
+              <span class="event_launcher" onload="set_favorite_button_space_inner_html({{ tweet.id }},false)" style="display:none;"></span>
+            {% endif %}
             <td>{{ tweet.id }}</td>
-            <td><a href={% url 'tweets:detail' tweet.pk %}>{{ tweet.content }}</a></td>
+            <td><a href={% url 'tweets:detail' tweet.id %}>{{ tweet.content }}</a></td>
             <td>{{ tweet.created_at }}</td>
             <td>{{ tweet.user }}</td>
             <td>
-              <span id="favorite_unfavorite_button">
-                {% if tweet not in favorited_tweets %}
-                  <input type="button" value="いいね" onclick="set_or_unset_favorite_tweet('{% url 'tweets:favorite' tweet.id %}')">
-                {% else %}
-                  <input type="button" value="いいね取消" onclick="set_or_unset_favorite_tweet('{% url 'tweets:unfavorite' tweet.id %}')">
-                {% endif %}
-              </span>
+                <input id="favorite_button{{tweet.id}}" value="いいね" type="button" onclick="set_or_unset_favorite_tweet('{% url 'tweets:favorite' tweet.id %}',{{ tweet.id }},true)">
+            </td>
+            <td>
+                <input id="unfavorite_button{{tweet.id}}" value="いいね取消" type="button" onclick="set_or_unset_favorite_tweet('{% url 'tweets:unfavorite' tweet.id %}',{{ tweet.id }},false)">
             </td>
             <td>
               {% if tweet.user == request.user %}
@@ -60,6 +64,5 @@ HOME
       <a href="{% url 'accounts:signin' %}"><button>SignIn</button></a>
     </div>
     {% endif %}
-  </h2>
   <script src="{% static 'js/set_or_unset_favorite.js' %}"></script>
 {% endblock body %}
