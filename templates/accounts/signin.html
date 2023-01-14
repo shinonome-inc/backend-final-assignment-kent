@@ -1,17 +1,15 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title%} サインイン {%endblock%}
 
 {% block body %}
 <h1>SignIn</h1>
 
-<form method="POST" action="">
+<form method="POST">
     {% csrf_token %}
     {{ context }}
     {{ form.as_p }}
-    {{form.non_field_errors}}
-    {% if not form.non_field_errors %}
-        <input type="submit" id="save"/>
-    {% endif %}
+    <button type="submit">ログイン</button>
 </form>
 {% endblock %}

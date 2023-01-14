@@ -17,12 +17,15 @@ class Tweet(models.Model):
 
 
 class Favorite(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="favoriting_user"
-    )
-    tweet = models.ForeignKey(
-        Tweet, on_delete=models.CASCADE, related_name="favorited_tweet"
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE, related_name="tweet")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.user.username} likes Tweet by IDed {str(Tweet.pk)}"
+        return f'"{self.user.username}" likes "{self.tweet.content}"'
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "tweet"], name="unique_favorite"),
+        ]

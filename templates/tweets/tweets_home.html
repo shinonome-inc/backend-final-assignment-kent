@@ -1,13 +1,16 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
-  WELCOME
+HOME
 {% endblock title %}
+
 {% block body %}
   <h1>Backend Final Assignment</h1>
-  <h2>
     {% if request.user.is_authenticated %}
-    {{ request.user.username }}
+    <h2>
+      {{ request.user.username }}
+    </h2>
     <div>
       <a href="{% url 'accounts:signout' %}"><button>SignOut</button></a>
     </div>
@@ -21,14 +24,30 @@
             <th>内容</th>
             <th>作成日</th>
             <th>ユーザー</th>
+            <th>いいね</th>
+            <th>いいね取消</th>
             <th>削除</th>
         </tr>
         {% for tweet in tweets %}
           <tr>
             <td>{{ tweet.id }}</td>
-            <td><a href={% url 'tweets:detail' tweet.pk %}>{{ tweet.content }}</a></td>
+            <td><a href={% url 'tweets:detail' tweet.id %}>{{ tweet.content }}</a></td>
             <td>{{ tweet.created_at }}</td>
             <td>{{ tweet.user }}</td>
+            <td>
+              {% if tweet not in favorited_tweets %}
+                <input id="favorite_button{{tweet.id}}" data-tweet-id={{tweet.id}} data-is-favorited="false" data-tweet-url="{% url 'tweets:favorite' tweet.id %}" value="いいね" type="button" onclick="set_or_unset_favorite_tweet(event)" style="visibility:visible;">
+              {% else %}
+                <input id="favorite_button{{tweet.id}}" data-tweet-id={{tweet.id}} data-is-favorited="false" data-tweet-url="{% url 'tweets:favorite' tweet.id %}" value="いいね" type="button" onclick="set_or_unset_favorite_tweet(event)" style="visibility:hidden;">
+              {% endif %}
+            </td>
+            <td>
+              {% if tweet in favorited_tweets %}
+                <input id="unfavorite_button{{tweet.id}}" data-tweet-id={{tweet.id}} data-is-favorited="true" data-tweet-url="{% url 'tweets:unfavorite' tweet.id %}" value="いいね取消" type="button" onclick="set_or_unset_favorite_tweet(event)" style="visibility:visible;">
+              {% else %}
+                <input id="unfavorite_button{{tweet.id}}" data-tweet-id={{tweet.id}} data-is-favorited="true" data-tweet-url="{% url 'tweets:unfavorite' tweet.id %}" value="いいね取消" type="button" onclick="set_or_unset_favorite_tweet(event)" style="visibility:hidden;">
+              {% endif %}
+            </td>
             <td>
               {% if tweet.user == request.user %}
                 <form action="{% url 'tweets:delete' tweet.id %}" method="POST">
@@ -41,7 +60,6 @@
         {% endfor %}
       </table>
     </div>
-    
     {% else %}
     現在ログインしていません
     <div>
@@ -49,5 +67,5 @@
       <a href="{% url 'accounts:signin' %}"><button>SignIn</button></a>
     </div>
     {% endif %}
-  </h2>
+  <script src="{% static 'js/set_or_unset_favorite.js' %}"></script>
 {% endblock body %}

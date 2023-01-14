@@ -119,24 +119,38 @@ class TestFavoriteView(TestCase):
         self.client.force_login(user=self.user)
         self.tweet = Tweet.objects.create(content="test_tweet", user=self.user)
         self.tweet_id = self.tweet.pk
+        self.pre_favorite_count = Favorite.objects.count()
 
     def test_success_post(self):
-        response = self.client.post(
+        request = self.client.post(
             reverse("tweets:favorite", kwargs={"pk": self.tweet_id})
         )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(Favorite.objects.count(), 1)
+        self.assertEqual(request.status_code, 200)
+        post_favorite_count = Favorite.objects.count()
+        self.assertEqual(post_favorite_count, self.pre_favorite_count + 1)
 
     def test_failure_post_with_not_exist_tweet(self):
-        response = self.client.post(
-            reverse("tweets:favorite", kwargs={"pk": self.tweet_id + 1})
+        unexist_tweet_id = self.tweet_id + 1
+        request = self.client.post(
+            reverse("tweets:favorite", kwargs={"pk": unexist_tweet_id})
         )
-        self.assertEqual(response.status_code, 404)
-        print(response.context)
-        self.assertEqual(Favorite.objects.count(), 0)
+        err_msg = b"The requested resource was not found on this server."
+        self.assertIn(err_msg, request.content)
+        self.assertEqual(request.status_code, 404)
+        post_favorite_count = Favorite.objects.count()
+        self.assertEqual(post_favorite_count, self.pre_favorite_count)
 
     def test_failure_post_with_favorited_tweet(self):
-        pass
+        self.tweet = Tweet.objects.create(content="favorited_tweet", user=self.user)
+        self.favorited_tweet_id = self.tweet.pk
+        Favorite.objects.create(user=self.user, tweet=self.tweet)
+        pre_favorite_count = Favorite.objects.count()
+        request = self.client.post(
+            reverse("tweets:favorite", kwargs={"pk": self.favorited_tweet_id})
+        )
+        self.assertEqual(request.status_code, 200)
+        post_favorite_count = Favorite.objects.count()
+        self.assertEqual(post_favorite_count, pre_favorite_count)
 
 
 class TestUnfavoriteView(TestCase):
@@ -147,12 +161,32 @@ class TestUnfavoriteView(TestCase):
         self.client.force_login(user=self.user)
         self.tweet = Tweet.objects.create(content="test_tweet", user=self.user)
         self.tweet_id = self.tweet.pk
+        Favorite.objects.create(user=self.user, tweet=self.tweet)
+        self.pre_favorite_count = Favorite.objects.count()
 
     def test_success_post(self):
-        pass
+        request = self.client.post(
+            reverse("tweets:unfavorite", kwargs={"pk": self.tweet_id})
+        )
+        self.assertEqual(request.status_code, 200)
+        post_favorite_count = Favorite.objects.count()
+        self.assertEqual(post_favorite_count, self.pre_favorite_count - 1)
 
     def test_failure_post_with_not_exist_tweet(self):
-        pass
+        unexist_tweet_id = self.tweet_id + 1
+        request = self.client.post(
+            reverse("tweets:favorite", kwargs={"pk": unexist_tweet_id})
+        )
+        err_msg = b"The requested resource was not found on this server."
+        self.assertIn(err_msg, request.content)
+        self.assertEqual(request.status_code, 404)
+        post_favorite_count = Favorite.objects.count()
+        self.assertEqual(post_favorite_count, self.pre_favorite_count)
 
     def test_failure_post_with_unfavorited_tweet(self):
-        pass
+        tweet = Tweet.objects.create(content="unfavorited_tweet", user=self.user)
+        self.unfavorited_tweet_id = tweet.pk
+        request = self.client.post(
+            reverse("tweets:favorite", kwargs={"pk": self.unfavorited_tweet_id})
+        )
+        self.assertEqual(request.status_code, 200)

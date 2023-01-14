@@ -8,6 +8,6 @@ urlpatterns = [
     path("create/", views.TweetCreateView.as_view(), name="create"),
     path("<int:pk>/detail", views.TweetDetailView.as_view(), name="detail"),
     path("<int:pk>/delete/", views.TweetDeleteView.as_view(), name="delete"),
-    path("<int:pk>/like/", views.LikeView.as_view(), name="like"),
-    path("<int:pk>/unlike/", views.UnlikeView.as_view(), name="unlike"),
+    path("<int:pk>/favorite/", views.FavoriteView.as_view(), name="favorite"),
+    path("<int:pk>/unfavorite/", views.UnfavoriteView.as_view(), name="unfavorite"),
 ]
