@@ -30,20 +30,23 @@ HOME
         </tr>
         {% for tweet in tweets %}
           <tr>
-            {% if tweet in favorited_tweets %}
-              <span class="event_launcher" onload="set_favorite_button_space_inner_html({{ tweet.id }},true)" style="display:none;"></span>
-            {% else %}
-              <span class="event_launcher" onload="set_favorite_button_space_inner_html({{ tweet.id }},false)" style="display:none;"></span>
-            {% endif %}
             <td>{{ tweet.id }}</td>
             <td><a href={% url 'tweets:detail' tweet.id %}>{{ tweet.content }}</a></td>
             <td>{{ tweet.created_at }}</td>
             <td>{{ tweet.user }}</td>
             <td>
-                <input id="favorite_button{{tweet.id}}" value="いいね" type="button" onclick="set_or_unset_favorite_tweet('{% url 'tweets:favorite' tweet.id %}',{{ tweet.id }},true)">
+              {% if tweet not in favorited_tweets %}
+                <input id="favorite_button{{tweet.id}}" data-tweet-id={{tweet.id}} data-is-favorited="false" data-tweet-url="{% url 'tweets:favorite' tweet.id %}" value="いいね" type="button" onclick="set_or_unset_favorite_tweet(event)" style="visibility:visible;">
+              {% else %}
+                <input id="favorite_button{{tweet.id}}" data-tweet-id={{tweet.id}} data-is-favorited="false" data-tweet-url="{% url 'tweets:favorite' tweet.id %}" value="いいね" type="button" onclick="set_or_unset_favorite_tweet(event)" style="visibility:hidden;">
+              {% endif %}
             </td>
             <td>
-                <input id="unfavorite_button{{tweet.id}}" value="いいね取消" type="button" onclick="set_or_unset_favorite_tweet('{% url 'tweets:unfavorite' tweet.id %}',{{ tweet.id }},false)">
+              {% if tweet in favorited_tweets %}
+                <input id="unfavorite_button{{tweet.id}}" data-tweet-id={{tweet.id}} data-is-favorited="true" data-tweet-url="{% url 'tweets:unfavorite' tweet.id %}" value="いいね取消" type="button" onclick="set_or_unset_favorite_tweet(event)" style="visibility:visible;">
+              {% else %}
+                <input id="unfavorite_button{{tweet.id}}" data-tweet-id={{tweet.id}} data-is-favorited="true" data-tweet-url="{% url 'tweets:unfavorite' tweet.id %}" value="いいね取消" type="button" onclick="set_or_unset_favorite_tweet(event)" style="visibility:hidden;">
+              {% endif %}
             </td>
             <td>
               {% if tweet.user == request.user %}
